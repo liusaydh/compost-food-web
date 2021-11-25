@@ -1,45 +1,59 @@
-#=============================================================================
-# Start code + packages
-#=============================================================================
+---
+title: "FUN SUGAR RUSH"
+author: "Madalina"
+date: "25/11/2021"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Model setup
+
+We load the libraries
+
+```{r}
 require(deSolve)
+```
 
-#=============================================================================
-# State and parameter formulation
-#=============================================================================
-
-#compartments/state variables go here, units are mol C (per kg of compost)
+We define initial values for state variables and parameters
+```{r}
 C.INI <- 300/180*6
-state <- c(BACTERIA = 0.10*C.INI, FUNGI = 0.05*C.INI, A.BISPORUS = 0.001*C.INI, SUGARS = 0.01*C.INI, COMPOST = C.INI, CO2 = 0)
+state <- c(BACTERIA = 0.10*C.INI, FUNGI = 0.05*C.INI, A.BISPORUS = 0.001*C.INI, 
+           SUGARS = 10*0.01*C.INI, COMPOST = C.INI, CO2 = 0)
 
 #parameters that comprise rate laws of processes go here
 parms <- c(
-  k20.bac.mort = 1,
+  k20.bac.mort = 0*1,
   k21.fun.mort = 1/7,
   k22.bisp.mort = 1/7,
-  k11.bac.uptake = 1,
+  k11.bac.uptake = 1*1,
   kSUGARS.bac = 0.001*C.INI, # because of steady state
   kBISPORUS = 0.01*C.INI,
-  k12.fun.uptake = 1/7,
+  k12.fun.uptake = 0*1/7,
   kSUGARS.fun = 0.001*C.INI,
-  k13.bisp.uptake = 1,
+  k13.bisp.uptake = 0*1,
   kSUGARS.bisp = 0.001*C.INI,
   MAX.A.BISPORUS = 0.15*C.INI,
   k14.fun.killing.bac = 0,
   k15.bisp.killing.bac = 0,
   k16.bisp.killing.fun = 0,
-  k1.deg.bac = 0.1,
-  k2.deg.fun = 0.2,
-  k3.deg.bisp = 0.3,
+  k1.deg.bac = 0*0.1,
+  k2.deg.fun = 0*0.2,
+  k3.deg.bisp = 0*0.3,
   Ef.fun = 0.1, # C assimilation efficiency
   Ef.bac = 0.1,
   Ef.bisp = 0.1
 )
+```
 
-#=============================================================================
-# Model formulation
-#=============================================================================
+Here we define the model function.
 
+```{r}
 WHITEBUTTON <- function(t, state, parameters) { 
   with(as.list(c(state, parameters)),{
  
@@ -57,6 +71,8 @@ WHITEBUTTON <- function(t, state, parameters) {
       R2.deg.fun <- k2.deg.fun * FUNGI
       R3.deg.bisp <- k3.deg.bisp * A.BISPORUS
       
+      #x13C.bac <- BACTERIA13/BACTERIA
+      
   # Mass balances [molN/m3/day] go here
       dSUGARS     <- R20.bac.mort + 
                      R21.fun.mort + 
@@ -71,6 +87,8 @@ WHITEBUTTON <- function(t, state, parameters) {
                      R2.deg.fun + 
                      R3.deg.bisp
       
+      #dSUGARS13 <- R20.bac.mort*x13C.BACTERIA + ... - R11.bac.uptake*x13C.SUGARS
+      
       dBACTERIA   <- Ef.bac*R11.bac.uptake - 
                      R15.bisp.killing.bac - 
                      R20.bac.mort - 
@@ -83,6 +101,8 @@ WHITEBUTTON <- function(t, state, parameters) {
       dA.BISPORUS <- Ef.bisp*R13.bisp.uptake - 
                      R22.bisp.mort
       
+      #dA.BISPORUS <- Ef.bisp*R13.bisp.uptake*x13C.SUGARS + ...
+        
       dCO2        <- (1-Ef.bac)*R11.bac.uptake + 
                      (1-Ef.fun)*R12.fun.uptake + 
                      (1-Ef.bisp)*R13.bisp.uptake
@@ -101,17 +121,23 @@ WHITEBUTTON <- function(t, state, parameters) {
               )
       })
 }
+```
 
-#=============================================================================
-# Model run
-#=============================================================================
+And finally we run the model and plot the results.
 
+```{r}
 outtimes     <- seq(from = 0, to = 24, length.out = 241)
-
 model_output <- ode(y = state, parms = parms, func = WHITEBUTTON, times = outtimes)
+```
 
-plot(model_output, mfrow=c(2,5))
+```{r, fig.height=4, fig.width=8}
+plot(model_output, mfrow=c(1,3), which=c("BACTERIA", "FUNGI", "A.BISPORUS"))
+```
 
-#=============================================================================
-# End code
-#=============================================================================
+```{r, fig.height=4, fig.width=8}
+plot(model_output, mfrow=c(1,3), which=c("SUGARS", "COMPOST", "CO2"))
+```
+
+```{r, fig.height=4, fig.width=8}
+plot(model_output, mfrow=c(1,3), which=c("TOTAL_C", "R11.bac.uptake", "R12.fun.uptake"))
+```
