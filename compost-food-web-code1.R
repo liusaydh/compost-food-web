@@ -7,38 +7,33 @@ require(deSolve)
 #=============================================================================
 # State and parameter formulation
 #=============================================================================
+x <- 0
 
 #compartments/state variables go here, units are mmolC/m3
-state <- c(BACTERIA = x, FUNGI = x, A.BISPORUS = x, NEMATODES = x, COMPOST = x)
+state <- c(BACTERIA = x, FUNGI = x, A.BISPORUS = x, SUGARS = x, COMPOST = , CO2 = x)
 
 #parameters that comprise rate laws of processes go here
 parms <- c(
-  fluxTRACER    = x,          # [mmolC/m3]
-  pResp_2       = x,          # [-]
-  pResp_3       = x,          # [-]
-  pResp_4       = x,          # [-]
-  pResp_5       = x,          # [-]
-  pResp_6       = x,          # [-]
-  pResp_7       = x,          # [-]
-  pResp_8       = x,          # [-]
-  pResp_9       = x,          # [-]
-  pResp_10      = x,          # [-]
-  rupmax.B      = x,          # [/day]
-  rupmax.F      = x,          # [/day]
-  rupmax.AB     = x,          # [/day]
-  kCOMPOST      = x,          # [mmolC/m3]
-  kA.BISPORUS   = x,          # [mmolC/m3]
-  kBACTERIA     = x,          # [mmolC/m3]
-  maxPred.B_F   = x,          # [/day]
-  maxPred.B_AB  = x,          # [/day]
-  maxPred.F_AB  = x,          # [/day]
-  maxPred.B_N   = x,          # [/day]
-  maxPred.F_N   = x,          # [/day]
-  maxPred.AB_N  = x,          # [/day]
-  r.Mort.B      = x,          # [/(mmolC/m3)/day]
-  r.Mort.F      = x,          # [/(mmolC/m3)/day]
-  r.Mort.AB     = x,          # [/(mmolC/m3)/day]
-  r.Mort.N      = x           # [/(mmolC/m3)/day]
+  k20.bac.mort * BACTERIA
+  k21.fun.mort * FUNGI
+  k22.bisp.mort * A.BISPORUS
+  k11.bac.uptake * SUGARS/(SUGARS+kSUGARS.bac) * BACTERIA * kBISPORUS/(A.BISPORUS+kBISPORUS)
+  kSUGARS.bac = 
+  kBISPORUS = 
+  k12.fun.uptake * SUGARS/(SUGARS+kSUGARS.fun) * FUNGI * kBISPORUS/(A.BISPORUS+kBISPORUS)
+  kSUGARS.fun = 
+  k13.bisp.uptake * SUGARS/(SUGARS+kSUGARS.bisp) * A.BISPORUS * (1-A.BISPORUS/MAX.A.BISPORUS)
+  kSUGARS.bisp = 
+  MAX.A.BISPORUS = 
+  k14.fun.killing.bac * BACTERIA * FUNGI
+  k15.bisp.killing.bac * BACTERIA * A.BISPORUS
+  k16.bisp.killing.fun * FUNGI * A.BISPORUS
+  k1.deg.bac * BACTERIA
+  k2.deg.fun * FUNGI
+  k3.deg.bisp * A.BISPORUS
+  Ef.fun = 
+  Ef.bac = 
+  Ef.bisp = 
 )
 
 #=============================================================================
@@ -49,40 +44,55 @@ WHITEBUTTON <- function(t, state, parameters) {
   with(as.list(c(state, parameters)),{
  
   # Rate expressions - all in units of [mmolC/m3/day] go here
-      R1   <-   fluxTRACER
-      R2   <-   pResp_2      * R11 
-      R3   <-   pResp_3      * R12
-      R4   <-   pResp_4      * R13 
-      R5   <-   pResp_5      * R14 
-      R6   <-   pResp_6      * R15 
-      R7   <-   pResp_7      * R16 
-      R8   <-   pResp_8      * R17 
-      R9   <-   pResp_9      * R18 
-      R10  <-   pResp_10     * R19 
-      R11  <-   rupmax.B     * COMPOST/(COMPOST+kCOMPOST) * BACTERIA
-      R12  <-   rupmax.F     * COMPOST/(COMPOST+kCOMPOST) * kA.BISPORUS/(A.BISPORUS+kA.BISPORUS) * FUNGI
-      R13  <-   rupmax.AB    * COMPOST/(COMPOST+kCOMPOST) * kFUNGI/(FUNGI+kFUNGI) * A.BISPORUS
-      R14  <-   maxPred.B_F  * BACTERIA/(BACTERIA+kBACTERIA) * kA.BISPORUS/(A.BISPORUS+kA.BISPORUS) * FUNGI
-      R15  <-   maxPred.B_AB * BACTERIA/(BACTERIA+kBACTERIA) * kFUNGI/(FUNGI+kFUNGI) * A.BISPORUS
-      R16  <-   maxPred.F_AB * FUNGI/(FUNGI+kFUNGI) * A.BISPORUS
-      R17  <-   maxPred.B_N  * BACTERIA/(BACTERIA+kBACTERIA) * NEMATODES
-      R18  <-   maxPred.F_N  * FUNGI/(FUNGI+kFUNGI) * NEMATODES
-      R19  <-   maxPred.AB_N * A.BISPORUS/(A.BISPORUS+kA.BISPORUS) * NEMATODES
-      R20  <-   r.Mort.B     * BACTERIA * BACTERIA
-      R21  <-   r.Mort.F     * FUNGI * FUNGI
-      R22  <-   r.Mort.AB    * A.BISPORUS * A.BISPORUS
-      R23  <-   r.Mort.N     * NEMATODES * NEMATODES
-    
+      R20.bac.mort <- k20.bac.mort * BACTERIA
+      R21.fun.mort <- k21.fun.mort * FUNGI
+      R22.bisp.mort <- k22.bisp.mort * A.BISPORUS
+      R11.bac.uptake <- k11.bac.uptake * SUGARS/(SUGARS+kSUGARS.bac) * BACTERIA * kBISPORUS/(A.BISPORUS+kBISPORUS)
+      R12.fun.uptake <- k12.fun.uptake * SUGARS/(SUGARS+kSUGARS.fun) * FUNGI * kBISPORUS/(A.BISPORUS+kBISPORUS)
+      R13.bisp.uptake <- k13.bisp.uptake * SUGARS/(SUGARS+kSUGARS.bisp) * A.BISPORUS * (1-A.BISPORUS/MAX.A.BISPORUS)
+      R14.fun.killing.bac <- k14.fun.killing.bac * BACTERIA * FUNGI
+      R15.bisp.killing.bac <- k15.bisp.killing.bac * BACTERIA * A.BISPORUS
+      R16.bisp.killing.fun <- k16.bisp.killing.fun * FUNGI * A.BISPORUS
+      R1.deg.bac <- k1.deg.bac * BACTERIA
+      R2.deg.fun <- k2.deg.fun * FUNGI
+      R3.deg.bisp <- k3.deg.bisp * A.BISPORUS
+      
   # Mass balances [molN/m3/day] go here
-      dCOMPOST    = R1 + R20 + R21 + R22 + R23 - R11 - R12 - R13
-      dBACTERIA   = R11 - R2 - R14 - R15 - R17 - R20
-      dFUNGI      = R12 + R14 - R3 - R5 - R16 - R18 - R21
-      dA.BISPORUS = R13 + R15 + R16 - R4 - R6 - R7 - R19 - R22
-      dNEMATODES  = R17 + R18 + R19 - R8 - R9 - R10 - R23
-      TOTAL_C     = COMPOST + BACTERIA + FUNGI + A.BISPORUS + NEMATODES            # [mmolC/m3]
+      dSUGARS     <- R20.bac.mort + 
+                     R21.fun.mort + 
+                     R22.bisp.mort - 
+                     R11.bac.uptake - 
+                     R12.fun.uptake - 
+                     R13.bisp.uptake + 
+                     R14.fun.killing.bac + 
+                     R15.bisp.killing.bac + 
+                     R16.bisp.killing.fun +
+                     R1.deg.bac + 
+                     R2.deg.fun + 
+                     R3.deg.bisp
+      
+      dBACTERIA   <- Ef.bac*R11.bac.uptake - 
+                     R15.bisp.killing.bac - 
+                     R20.bac.mort - 
+                     R14.fun.killing.bac
+      
+      dFUNGI      <- Ef.fun*R12.fun.uptake - 
+                     R16.bisp.killing.fun - 
+                     R21.fun.mort
+      
+      dA.BISPORUS <- Ef.bisp*R13.bisp.uptake - 
+                     R22.bisp.mort
+      
+      dCO2        <- (1-Ef.bac)*R11.bac.uptake + 
+                     (1-Ef.fun)*R12.fun.uptake + 
+                     (1-Ef.bisp)*R13.bisp.uptake
+      
+      dCOMPOST    <- -R1.deg.bac - R2.deg.fun - R3.deg.bisp
+      
+      TOTAL_C     <- COMPOST + BACTERIA + SUGARS + FUNGI + A.BISPORUS + CO2
       
   # Model output goes here
-      return (list(c(dCOMPOST, dBACTERIA, dFUNGI, dA.BISPORUS, dNEMATODES),
+      return (list(c(dBACTERIA, dFUNGI, dA.BISPORUS, dSUGARS, dCOMPOST, dCO2),
                      TOTAL_C = TOTAL_C)
               )
       })
