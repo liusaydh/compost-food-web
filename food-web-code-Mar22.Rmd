@@ -58,7 +58,7 @@ Here we define the model function.
 WHITEBUTTON <- function(t, state, parameters) { 
   with(as.list(c(state, parameters)),{
  
-  # Rate expressions - all in units of [mmolC/m3/day] go here
+  # Rate expressions - all in units of [mmolC/m3/day] or [molC/kg compost] go here
       R1.deg.bac          <- k1.deg.bac * BACTERIA
       R2.deg.fun          <- k2.deg.fun * FUNGI
       R3.deg.bisp         <- k3.deg.bisp * A.BISPORUS
@@ -91,10 +91,10 @@ WHITEBUTTON <- function(t, state, parameters) {
       #dSUGARS13 <- R20.bac.mort*x13C.BACTERIA + ... - R11.bac.uptake*x13C.SUGARS
       
       dBACTERIA   <- Ef.bac*R4.bac.uptake - 
+                     R7.fun.killing.bac -
                      R8.bisp.killing.bac - 
                      R10.bac.mort - 
-                     R7.fun.killing.bac
-      
+                     
       dFUNGI      <- Ef.fun*R5.fun.uptake - 
                      R9.bisp.killing.fun - 
                      R11.fun.mort
