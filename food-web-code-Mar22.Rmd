@@ -93,7 +93,7 @@ WHITEBUTTON <- function(t, state, parameters) {
       dBACTERIA   <- Ef.bac*R4.bac.uptake - 
                      R7.fun.killing.bac -
                      R8.bisp.killing.bac - 
-                     R10.bac.mort - 
+                     R10.bac.mort 
                      
       dFUNGI      <- Ef.fun*R5.fun.uptake - 
                      R9.bisp.killing.fun - 
