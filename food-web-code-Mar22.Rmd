@@ -1,7 +1,7 @@
 ---
 title: "Working model without nematodes and without parameters"
 author: "Lucy"
-date: "12/03/2022"
+date: "21/03/2022"
 output:
   pdf_document: default
   html_document: default
