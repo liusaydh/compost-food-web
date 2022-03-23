@@ -11,6 +11,6 @@ In its first functional form, the food web is modelled to exclude nematode popul
 
 Parameter | Description | Unit | Value | Source(s) | Comments |
 --- | --- | --- | --- |--- |--- |
-k10.bac.mort | bacterial mortality rate | /d | 0.24 - 0.72 | Servais et al., 1985. | in water environments |
-k11.fun.mort | fungal mortality rate | /d | 0 | Koch, 1958. | death under suitable growth conditions is uncommon |
-k12.bisp.mort | _A. bisporus_ mortality rate | /d | 0.01 | Lamour, 2002. | generally slower than bacteria, also due to predation |
+k10.bac.mort | bacterial mortality rate | (mmol C per cubic meter)/d | 0.24 - 0.72 | Servais et al., 1985. | in water environments |
+k11.fun.mort | fungal mortality rate | (mmol C per cubic meter)/d | 0 | Koch, 1958. | death under suitable growth conditions is uncommon |
+k12.bisp.mort | _A. bisporus_ mortality rate | (mmol C per cubic meter)/d | 0.01 - 0.1 | Lamour, 2002. | generally slower than bacteria |
