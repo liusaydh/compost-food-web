@@ -14,11 +14,11 @@ Parameter | Description | Unit | Value | Source(s) | Comments |
 Ef.bac | fraction of C assimilated by bacteria into their biomass as a result of metabolisation of sugars | (-) | 0.3 | Sinsabaugh, 2016. + Aanderud, 2018. | max. 30% is assimilated in biomass for soil dwellers, and is based on their C:N biomass ratio (around 8)
 Ef.fun | fraction of C assimilated by fungi into their biomass as a result of metabolisation of sugars | (-) | 0.3 | Sinsabaugh, 2016. + Aanderud, 2018. | should be less than bacteria though, up to 10 times less 
 Ef.bisp | fraction of C assimilated by _A. bisporus_ into their biomass as a result of metabolisation of sugars | (-) | 0.3 | Sinsabaugh, 2016. + Aanderud, 2018. |
-kBISPORUS | Monod rate constant for _A. bisporus_ biomass | mol C/kg | UNKNOWN | (to be) calibrated |  
-MAX.A.BISPORUS | maximum possible unlimited _A. bisporus_ biomass growth | mol C/kg | UNKNOWN | (to be) calibrated |
-kSUGARS.bac | bacterial growth limitation due to sugars availability (C.INI * %) | mol C/kg | UNKNOWN | (to be) calibrated |
-kSUGARS.fun | fungal growth limitation due to sugars availability (C.INI * %) | mol C/kg | UNKNOWN | (to be) calibrated |    
-kSUGARS.bisp | _A. bisporus_ growth limitation due to sugars availability (C.INI * %) | mol C/kg | UNKNOWN | (to be) calibrated |  
+kBISPORUS | Monod rate constant for _A. bisporus_ biomass | mmol C per cubic meter | UNKNOWN | (to be) calibrated |  
+MAX.A.BISPORUS | maximum possible unlimited _A. bisporus_ biomass growth | mmol C per cubic meter | UNKNOWN | (to be) calibrated |
+kSUGARS.bac | bacterial growth limitation due to sugars availability (C.INI * %) | mmol C per cubic meter | UNKNOWN | (to be) calibrated |
+kSUGARS.fun | fungal growth limitation due to sugars availability (C.INI * %) | mmol C per cubic meter | UNKNOWN | (to be) calibrated |    
+kSUGARS.bisp | _A. bisporus_ growth limitation due to sugars availability (C.INI * %) | mmol C per cubic meter | UNKNOWN | (to be) calibrated |  
 k1.deg.bac | degradation of recalcitrant materials from compost into sugars by bacteria | /d | 0.05 - 0.15 | Soares & Rousk, 2019. + Vîtă/van Dam 2020. | 
 k2.deg.fun | degradation of recalcitrant materials from compost into sugars by fungi | /d | 0.05 - 0.15 | Soares & Rousk, 2019. + Vîtă/van Dam 2020. | 
 k3.deg.bisp | degradation of recalcitrant materials from compost into sugars by _A. bisporus_ | /d | 0.075 - 0.13 | Andlar et al. 2018. | values found correspond to fungi whose active enzymes are incredibly similar in activity to _A. bisporus_
