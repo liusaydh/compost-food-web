@@ -124,7 +124,7 @@ WHITEBUTTON <- function(t, state, parameters) {
 }
 ```
 
-And finally we run the model and plot the results.
+And finally we run the model and plot out the results.
 
 ```{r}
 outtimes     <- seq(from = 0, to = 24, length.out = 241)
