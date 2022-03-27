@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Model setup
 
-Loading the libraries necessary, deSolve for the run of the model and shiny for the interactive interface.
+Loading the libraries necessary, deSolve for the run of the model and shiny for the interactive UI.
 
 ```{r}
 require(shiny)
