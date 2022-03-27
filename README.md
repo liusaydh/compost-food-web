@@ -29,5 +29,5 @@ k7.fun.killing.bac | maximum predation rate constant for fungi predating on bact
 k8.bisp.killing.bac | maximum predation rate constant for _A. bisporus_ predating on bacteria | /d | UNKNOWN | (to be) calibrated |
 k9.bisp.killing.fun | maximum predation rate constant for _A. bisporus_ predating on fungi | /d | UNKNOWN | (to be) calibrated |
 k10.bac.mort | bacterial linear mortality rate constant | (mmol C per cubic meter)/d | 0.24 - 0.72 | Servais et al., 1985. | in water environments |
-k11.fun.mort | fungal linear mortality rate constant | (mmol C per cubic meter)/d | 0 | Koch, 1958. | death under suitable growth conditions is uncommon |
-k12.bisp.mort | _A. bisporus_ linear mortality rate constant | (mmol C per cubic meter)/d | 0.01 - 0.1 | Lamour, 2002. | generally slower than bacteria |
+k11.fun.mort | fungal linear mortality rate constant | (mmol C per cubic meter)/d | 0.01 - 0.1 | Lamour, 2002. | generally slower than bacteria |
+k12.bisp.mort | _A. bisporus_ linear mortality rate constant | (mmol C per cubic meter)/d | 0 | Koch, 1958. | death under suitable growth conditions is uncommon |
