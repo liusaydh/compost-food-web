@@ -1,5 +1,5 @@
 ---
-title: "Working model without nematodes, + literature parameters, + interactive UI, - calibrated parameters, - literature statevar."
+title: "Working model without nematodes, + literature parameters, + interactive UI, - calibrated parameters, - literature state variables."
 author: "Lucy"
 date: "27/03/2022"
 output:
