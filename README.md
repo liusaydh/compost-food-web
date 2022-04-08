@@ -16,11 +16,11 @@ Ef.fun | fraction of C assimilated by fungi into their biomass as a result of me
 Ef.bisp | fraction of C assimilated by _A. bisporus_ into their biomass as a result of metabolisation of sugars | (-) | 0.016 - 0.3 | Krakowska, 2021., Sinsabaugh, 2016. + Aanderud, 2018. |
 kBISPORUS | Monod rate constant for _A. bisporus_ biomass | mmol C per cubic meter | UNKNOWN | (to be) calibrated |  
 MAX.A.BISPORUS | maximum possible unlimited _A. bisporus_ biomass growth | mmol C per cubic meter | UNKNOWN | (to be) calibrated |
-kSUGARS.bac | bacterial growth limitation due to sugars availability (C.INI * %) | mmol C per cubic meter | 0.1 - 0.2 | Vîtă (van Dam) 2022. | check star conditions in Femke's thesis
-kSUGARS.fun | fungal growth limitation due to sugars availability (C.INI * %) | mmol C per cubic meter | 0.1 - 0.2 | Vîtă (van Dam) 2022. | check star conditions in Femke's thesis    
+kSUGARS.bac | bacterial growth limitation due to sugars availability (C.INI * %) | mmol C per cubic meter | 0.1 - 0.2 | Vîtă (van Dam), 2022. | check star conditions in Femke's thesis
+kSUGARS.fun | fungal growth limitation due to sugars availability (C.INI * %) | mmol C per cubic meter | 0.1 - 0.2 | Vîtă (van Dam), 2022. | check star conditions in Femke's thesis    
 kSUGARS.bisp | _A. bisporus_ growth limitation due to sugars availability (C.INI * %) | mmol C per cubic meter | UNKNOWN | (to be) calibrated | expected similar to other fungi 
-k1.deg.bac | degradation of recalcitrant materials from compost into sugars by bacteria | /d | 0.05 - 0.15 | Soares & Rousk, 2019. + Vîtă (van Dam) 2022. | 
-k2.deg.fun | degradation of recalcitrant materials from compost into sugars by fungi | /d | 0.05 - 0.15 | Soares & Rousk, 2019. + Vîtă (van Dam) 2022. | fungi are expected to be better degraders than bacteria, in this context 
+k1.deg.bac | degradation of recalcitrant materials from compost into sugars by bacteria | /d | 0.05 - 0.15 | Soares & Rousk, 2019. + Vîtă (van Dam), 2022. | 
+k2.deg.fun | degradation of recalcitrant materials from compost into sugars by fungi | /d | 0.05 - 0.15 | Soares & Rousk, 2019. + Vîtă (van Dam), 2022. | fungi are expected to be better degraders than bacteria, in this context 
 k3.deg.bisp | degradation of recalcitrant materials from compost into sugars by _A. bisporus_ | /d | 0.075 - 0.13 | Andlar et al. 2018. | values found correspond to fungi whose active enzymes are incredibly similar in activity to _A. bisporus_
 k4.bac.uptake | maximum uptake rate of carbohydrates by bacteria | /d | 0.04 - 0.1 | Bore et al. 2017. |
 k5.fun.uptake | maximum uptake rate of carbohydrates by fungi | /d | 0.01 - 0.05 | Bore et al. 2017. |
@@ -31,3 +31,15 @@ k9.bisp.killing.fun | maximum predation rate constant for _A. bisporus_ predatin
 k10.bac.mort | bacterial linear mortality rate constant | (mmol C per cubic meter)/d | 0.24 - 0.72 | Servais et al., 1985. | in water environments |
 k11.fun.mort | fungal linear mortality rate constant | (mmol C per cubic meter)/d | 0.01 - 0.1 | Lamour, 2002. | generally slower than bacteria |
 k12.bisp.mort | _A. bisporus_ linear mortality rate constant | (mmol C per cubic meter)/d | 0 | Koch, 1958. | death under suitable growth conditions is uncommon |
+
+In addition, the system has starting state variables which are conditions that are in place the moment the model is ran. These most often refer to the amounts of biomass at the beginning of the run and are viewable in the table below.
+
+State variable | Description | Unit | Value | Source(s) | Comments |
+--- | --- | --- | --- |--- |--- |
+BACTERIA | biomass of bacteria present at Phase III start | (-) | 1.4% - 2.2% of compost | Vos, 2017., Vîtă, 2022. |
+FUNGI | biomass of fungi (excluding _A. bisporus_) present at Phase III start | (-) | 1.77% of compost | Vos, 2017. |
+A.BISPORUS | biomass of _A. bisporus_ present at Phase III start | (-) | 0.01% of compost | Vos, 2017., Vîtă, 2022. | technically, _A. bisporus_ biomass is zero because only he inoculate on rye grain is present, not the mycelium
+SUGARS | amount of sugars present at Phase III start as available monosaccharides | (-) | 26% of compost (w/w) | Jurak, 2013. |
+COMPOST | amount of total carbon present at Phase III start, mostly as undegraded polysaccharides | 12 - 15 | grams | Vîtă, 2022. | 30% carbon in 45 grams compost
+CO2 | amount of carbon dioxide present at Phase III start as a result of respiration | (-) | 0 | Vîtă (van Dam), 2022. |
+C.INI | amount of total carbon present in the system at Phase III start | 12 - 15 | grams | Vîtă, 2022. | same value as compost, used for easier calculation only
