@@ -40,6 +40,6 @@ BACTERIA | biomass of bacteria present at Phase III start | (-) | 1.4% - 2.2% of
 FUNGI | biomass of fungi (excluding _A. bisporus_) present at Phase III start | (-) | 1.77% of compost | Vos, 2017. |
 A.BISPORUS | biomass of _A. bisporus_ present at Phase III start | (-) | 0.01% of compost | Vos, 2017., Vîtă, 2022. | technically, _A. bisporus_ biomass is zero because only he inoculate on rye grain is present, not the mycelium
 SUGARS | amount of sugars present at Phase III start as available monosaccharides | (-) | 26% of compost (w/w) | Jurak, 2013. |
-COMPOST | amount of total carbon present at Phase III start, mostly as undegraded polysaccharides | 12 - 15 | grams | Vîtă, 2022. | 30% carbon in 45 grams compost
+COMPOST | amount of total carbon present at Phase III start, mostly as undegraded polysaccharides | grams | 12 - 15 | Vîtă, 2022. | 30% carbon in 45 grams compost
 CO2 | amount of carbon dioxide present at Phase III start as a result of respiration | (-) | 0 | Vîtă (van Dam), 2022. |
-C.INI | amount of total carbon present in the system at Phase III start | 12 - 15 | grams | Vîtă, 2022. | same value as compost, used for easier calculation only
+C.INI | amount of total carbon present in the system at Phase III start | grams | 12 - 15 | Vîtă, 2022. | same value as compost, used for easier calculation only
