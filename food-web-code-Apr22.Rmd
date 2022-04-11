@@ -1,7 +1,7 @@
 ---
-title: "Working model without nematodes, + literature parameters, + interactive UI, - calibrated parameters, - literature statevar."
+title: "Working model without nematodes, + literature parameters, + interactive UI, - calibrated parameters, + literature statevar."
 author: "Lucy"
-date: "27/03/2022"
+date: "11/04/2022"
 output:
   pdf_document: default
   html_document: default
@@ -24,31 +24,31 @@ Definition of initial state variables, initial parameters for the default model 
 
 ```{r}
 #----------------------------------------initial state variables----------------------------------------
-C.INI <- 300/180*6
-state <- c(BACTERIA = 0.10*C.INI, FUNGI = 0.05*C.INI, A.BISPORUS = 0.001*C.INI, SUGARS = 10*0.01*C.INI, COMPOST = C.INI, CO2 = 0)
+C.INI <- 15 #300/180*6, 12-14
+state <- c(BACTERIA = 0.022*C.INI, FUNGI = 0.0177*C.INI, A.BISPORUS = 0.01*C.INI, SUGARS = 0.26*C.INI, COMPOST = C.INI, CO2 = 0)
 
 #------------------------parameters that comprise rate laws of processes go here------------------------
 parms <- list(
   k1.deg.bac          = 0.05,             #0.05 - 0.15, literature value
   k2.deg.fun          = 0.05,             #0.05 - 0.15, literature value
-  k3.deg.bisp         = 0.075,            #0.075 - 0.13, literature value
-  k4.bac.uptake       = 0.04,             #0.04 - 0.1, literature value
-  k5.fun.uptake       = 0.01,             #0.01 - 0.05, literature value
-  k6.bisp.uptake      = 1,                #needs calibration, actually unknown, placeholder value used
-  k7.fun.killing.bac  = 0.1,              #needs calibration, actually unknown, placeholder value used
+  k3.deg.bisp         = 0.01,             #0.075 - 0.13, literature value
+  k4.bac.uptake       = 0.4,              #0.04 - 0.1, literature value
+  k5.fun.uptake       = 0.4,              #0.01 - 0.05, literature value
+  k6.bisp.uptake      = 0.2,              #needs calibration, actually unknown, placeholder value used
+  k7.fun.killing.bac  = 0.2,              #needs calibration, actually unknown, placeholder value used
   k8.bisp.killing.bac = 0.1,              #needs calibration, actually unknown, placeholder value used
-  k9.bisp.killing.fun = 0.1,              #needs calibration, actually unknown, placeholder value used
+  k9.bisp.killing.fun = 0.5,              #needs calibration, actually unknown, placeholder value used
   k10.bac.mort        = 0.24,             #0.24 - 0.72, literature value
-  k11.fun.mort        = 0.01,             #0.01 - 0.1, literature value
+  k11.fun.mort        = 0.1,              #0.01 - 0.1, literature value
   k12.bisp.mort       = 0,                #literature value
-  kBISPORUS           = 0.1,              #needs calibration, actually unknown, placeholder value used
-  MAX.A.BISPORUS      = 1.5,              #needs calibration, actually unknown, placeholder value used
-  kSUGARS.bac         = 0.1,              #needs calibration, actually unknown, placeholder value used
-  kSUGARS.fun         = 0.1,              #needs calibration, actually unknown, placeholder value used
-  kSUGARS.bisp        = 0.1,              #needs calibration, actually unknown, placeholder value used
+  kBISPORUS           = 0.5,              #needs calibration, actually unknown, placeholder value used
+  MAX.A.BISPORUS      = 1,                #needs calibration, actually unknown, placeholder value used
+  kSUGARS.bac         = 0.4,              #needs calibration, actually unknown, placeholder value used
+  kSUGARS.fun         = 0.4,              #needs calibration, actually unknown, placeholder value used
+  kSUGARS.bisp        = 0.2,              #needs calibration, actually unknown, placeholder value used
   Ef.fun              = 0.3,              #literature value
   Ef.bac              = 0.3,              #literature value
-  Ef.bisp             = 0.3               #literature value
+  Ef.bisp             = 0.4               #literature value
 )
 ```
 
