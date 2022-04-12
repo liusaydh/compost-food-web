@@ -1,0 +1,2 @@
+"0","outtimes     <- seq(from = 0, to = 40, length.out = 1000)"
+"0","model_output <- ode(y = state, parms = parms, func = WHITEBUTTON, times = outtimes)"

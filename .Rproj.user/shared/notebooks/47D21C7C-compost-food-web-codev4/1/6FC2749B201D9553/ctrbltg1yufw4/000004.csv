@@ -1,0 +1,1 @@
+"0","plot(model_output, mfrow=c(1,3), which=c(""R9.bisp.killing.fun"", ""R10.bac.mort"", ""R11.fun.mort""))"
