@@ -107,6 +107,12 @@ WHITEBUTTON <- function(t, state, parameters) {
                      (1-Ef.fun)*R5.fun.uptake + 
                      (1-Ef.bisp)*R6.bisp.uptake
       
+      #x13C.sugar <- SUGARS.13 / SUGARS
+      #dCO2.13     <- (1-Ef.bac)*R4.bac.uptake * x13C.sugar + 
+      #               (1-Ef.fun)*R5.fun.uptake * x13C.sugar + 
+      #               (1-Ef.bisp)*R6.bisp.uptake * x13C.sugar
+      
+      
       dCOMPOST    <- -R1.deg.bac - R2.deg.fun - R3.deg.bisp
       
       TOTAL_C     <- COMPOST + BACTERIA + SUGARS + FUNGI + A.BISPORUS + CO2
