@@ -1,1 +1,0 @@
-"0","plot(model_output, mfrow=c(1,3), which=c(""TOTAL_C"", ""R1.deg.bac"", ""R2.deg.fun""))"

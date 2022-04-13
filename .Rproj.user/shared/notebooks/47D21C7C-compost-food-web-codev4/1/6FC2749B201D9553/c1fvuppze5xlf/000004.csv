@@ -1,1 +1,0 @@
-"0","plot(model_output, mfrow=c(1,3), which=c(""R3.deg.bisp"", ""R4.bac.uptake"", ""R5.fun.uptake""))"
