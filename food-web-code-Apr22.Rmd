@@ -1,7 +1,7 @@
 ---
-title: "Working model without nematodes, + literature parameters, + interactive UI, - calibrated parameters, + literature statevar."
+title: "Working model without (nematodes, 13C version), with (literature parameters, PRETTY interactive UI, calibrated parameters, literature state variables)."
 author: "Lucy"
-date: "11/04/2022"
+date: "13/04/2022"
 output:
   pdf_document: default
   html_document: default
@@ -25,7 +25,14 @@ Definition of initial state variables, initial parameters for the default model 
 ```{r}
 #----------------------------------------initial state variables----------------------------------------
 C.INI <- 15 #300/180*6, 12-14
-state <- c(BACTERIA = 0.022*C.INI, FUNGI = 0.0177*C.INI, A.BISPORUS = 0.01*C.INI, SUGARS = 0.26*C.INI, COMPOST = C.INI, CO2 = 0)
+
+#state variables made to be a list, not a vector using c(), they are unlisted for the ode function where necessary as ode only takes y which is numeric, but UI takes only state variables as a named list
+
+#for the same reason, values of state variables are now numbers instead of percentages, but the values are based on COMPOST = 15 still, just recalculated to fit right from previous percentages
+
+#previously looked like this: state <- c(BACTERIA = 0.022*C.INI, FUNGI = 0.0177*C.INI, A.BISPORUS = 0.01*C.INI, SUGARS = 0.26*C.INI, COMPOST = C.INI, CO2 = 0)
+
+state <- list(BACTERIA = 0.33, FUNGI = 0.2655, A.BISPORUS = 0.15, SUGARS = 3.9, COMPOST = 15, CO2 = 0)
 #------------------------parameters that comprise rate laws of processes go here------------------------
 parms <- list(
   k1.deg.bac          = 0.05,             #0.05 - 0.15, literature value
@@ -39,7 +46,7 @@ parms <- list(
   k9.bisp.killing.fun = 0.5,              #needs calibration, actually unknown, placeholder value used
   k10.bac.mort        = 0.24,             #0.24 - 0.72, literature value
   k11.fun.mort        = 0.1,              #0.01 - 0.1, literature value
-  k12.bisp.mort       = 0,                #literature value
+  k12.bisp.mort       = 0.01,             #literature value
   kBISPORUS           = 0.5,              #needs calibration, actually unknown, placeholder value used
   MAX.A.BISPORUS      = 1,                #needs calibration, actually unknown, placeholder value used
   kSUGARS.bac         = 0.4,              #needs calibration, actually unknown, placeholder value used
@@ -133,7 +140,7 @@ Model is ran and the results are plotted separately - argument which defines the
 
 ```{r}
 outtimes     <- seq(from = 0, to = 40, length.out = 1000)
-model_output <- ode(y = state, parms = parms, func = WHITEBUTTON, times = outtimes)
+model_output <- ode(y = unlist(state), parms = parms, func = WHITEBUTTON, times = outtimes) #unlisted to use with ode, as mentioned
 ```
 
 ```{r, fig.height=4, fig.width=8}
@@ -153,71 +160,142 @@ plot(model_output, mfrow=c(1,3), which=c("R6.bisp.uptake"))
 ```
 
 ```{r}
-#---------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------------------------
 state       <- state
 times       <- outtimes
-defaultprog <- ode(y = state, times = outtimes, func = WHITEBUTTON, parms = parms)
-#---------------------------------------------------------------------------------------------------------
-UI.Si <- shinyUI(pageWithSidebar(
-  headerPanel("Compost Food Web Interactive Simulation"),
+defaultprog <- ode(y = unlist(state), times = outtimes, func = WHITEBUTTON, parms = parms) #unlisted to use with ode, as mentioned
+#---------------------------------------------------------------------------------------------------------------------------------
+ui <- fluidPage(fluid = TRUE,
 
-  sidebarPanel(
-   sliderInput(inputId="k1.deg.bac",   label = "degradation into sugars by bacteria, /d",   
-     min = 0.01, max = 1.0, step = 0.01, value = parms$k1.deg.bac),
-   sliderInput(inputId="k2.deg.fun",   label = "degradation into sugars by fungi, /d",        
-     min = 0.01, max = 1.0, step = 0.01, value = parms$k2.deg.fun),
-   sliderInput(inputId="k3.deg.bisp",  label = "degradation into sugars by A. bisporus, /d", 
-     min = 0.01, max = 1.0, step = 0.01, value = parms$k3.deg.bisp),
-   sliderInput(inputId="k4.bac.uptake", label = "maximum carb uptake rate by bacteria, /d", 
-     min = 0.01, max = 1.0, step = 0.01, value = parms$k4.bac.uptake),
-   sliderInput(inputId="k5.fun.uptake", label = "maximum carb uptake rate by fungi, /d",   
-     min = 0.01, max = 1.0, step = 0.01, value = parms$k5.fun.uptake),
-   sliderInput(inputId="k6.bisp.uptake", label = "maximum carb uptake rate by A. bisporus, /d", 
-     min = 0.01, max = 1.0, step = 0.01, value = parms$k6.bisp.uptake),
-   sliderInput(inputId="k7.fun.killing.bac", label = "maximum predation ct fungi > bacteria, /d", 
-     min = 0.01, max = 1.0, step = 0.01, value = parms$k7.fun.killing.bac),
-   sliderInput(inputId="k8.bisp.killing.bac", label = "maximum predation ct A. bisporus > bacteria, /d", 
-     min = 0.01, max = 1.0, step = 0.01, value = parms$k8.bisp.killing.bac),
-   sliderInput(inputId="k9.bisp.killing.fun", label = "maximum predation ct A. bisporus > fungi, /d", 
-     min = 0.01, max = 1.0, step = 0.01, value = parms$k9.bisp.killing.fun),
-   sliderInput(inputId="k10.bac.mort", label = "bacterial mct, (mmol C per cubic meter)/d", 
-     min = 0.01, max = 1.0, step = 0.01, value = parms$k10.bac.mort),
-   sliderInput(inputId="k11.fun.mort", label = "fungal mct, (mmol C per cubic meter)/d",   
-     min = 0.01, max = 1.0, step = 0.01, value = parms$k11.fun.mort),
-   sliderInput(inputId="k12.bisp.mort", label = "A. bisporus mct, (mmol C per cubic meter)/d", 
-     min = 0.01, max = 1.0, step = 0.01, value = parms$k12.bisp.mort),
-   sliderInput(inputId="kBISPORUS", label = "Monod ct A. bisporus, mmol C per cubic meter",   
-     min = 0.01, max = 1.0, step = 0.01, value = parms$kBISPORUS),
-   sliderInput(inputId="MAX.A.BISPORUS", label = "maxunlim A. bisporus growth, mmol C per cubic meter", 
-     min = 0.01, max = 5.0, step = 0.1, value = parms$MAX.A.BISPORUS),
-   sliderInput(inputId="kSUGARS.bac", label = "bacterial growth limit, mmol C per cubic meter",
-     min = 0.01, max = 2.0, step = 0.01, value = parms$kSUGARS.bac),
-   sliderInput(inputId="kSUGARS.fun", label = "fungal growth limit, mmol C per cubic meter", 
-     min = 0.01, max = 2.0, step = 0.01, value = parms$kSUGARS.fun),
-   sliderInput(inputId="kSUGARS.bisp", label = "A. bisporus growth limit, mmol C per cubic meter", 
-     min = 0.01, max = 2.0, step = 0.01, value = parms$kSUGARS.bisp),
-   sliderInput(inputId="Ef.bac", label = "%C assimilated by bacteria due to eating, (-)", 
-     min = 0.01, max = 1.0, step = 0.01, value = parms$Ef.bac),
-   sliderInput(inputId="Ef.fun", label = "%C assimilated by fungi due to eating, (-)", 
-     min = 0.01, max = 1.0, step = 0.01, value = parms$Ef.fun),
-   sliderInput(inputId="Ef.bisp", label = "%C assimilated by A. bisporus due to eating, (-)", 
-     min = 0.01, max = 1.0, step = 0.01, value = parms$Ef.bisp),
+#title, centered
+
+  titlePanel( 
+    h1("Compost Food Web Interactive Simulation", align = "center")
+  ),
+  
+#UI output
+  uiOutput("WB"),
+
+#sidebar and tabs
+  sidebarLayout(
+
+#aligns the plot at the center and resizes it to a nice size for both browser and RStudio launcher    
+   mainPanel(
+     fluidRow(
+          column(12, offset = 3, align="center",
+      plotOutput("PlotWB", height = "500px")
+          )
+     )
+   ),
+      
+ #creates UI using javascript conditionalPanel tests, bunches terms together under a single tab based on conditions
+   CreateUI <- renderUI({  
+    sidebarPanel(width = 12,
+       tabsetPanel(id = "tabselected",
+                   tabPanel(strong("degradation"),       value = 1, helpText("degradation of polysaccharides from compost")),
+                   tabPanel(strong("uptake"),            value = 2, helpText("mono-sugar uptake")),
+                   tabPanel(strong("predation"),         value = 3, helpText("predation rates")),
+                   tabPanel(strong("mortality"),         value = 4, helpText("mortality rates")),
+                   tabPanel(strong("Monod"),             value = 5, helpText("Monod (Michaelis-Menten) kinetics")),
+                   tabPanel(strong("efficiency"),        value = 6, helpText("uptake efficiency of sugars")),
+                   tabPanel(strong("initial states"),    value = 7, helpText("initial state variables (amounts and biomasses)"))
+       ),
+
+#be VERY CAREFUL with the indentation of conditional panels, otherwise nothing will ever work          
+       conditionalPanel(condition = "input.tabselected == 1",
+            fluidRow(
+                  column(12,
+                         sliderInput(inputId="k1.deg.bac", label = "degradation into sugars by bacteria (/d)", min = 0.01, max = 1.0, step = 0.01, value = parms$k1.deg.bac),
+                         sliderInput(inputId="k2.deg.fun", label = "degradation into sugars by fungi (/d)", min = 0.01, max = 1.0, step = 0.01, value = parms$k2.deg.fun),
+                         sliderInput(inputId="k3.deg.bisp",label = "degradation into sugars by A. bisporus (/d)", min = 0.01, max = 1.0, step = 0.01, value = parms$k3.deg.bisp)       
+                  ),
+            ),
+       ),
+
+       conditionalPanel(condition = "input.tabselected == 2",
+             fluidRow(
+                   column(12,
+                         sliderInput(inputId="k4.bac.uptake", label = "maximum carb uptake rate by bacteria (/d)", min = 0.01, max = 1.0, step = 0.01, value = parms$k4.bac.uptake),
+                         sliderInput(inputId="k5.fun.uptake", label = "maximum carb uptake rate by fungi (/d)", min = 0.01, max = 1.0, step = 0.01, value = parms$k5.fun.uptake),
+                         sliderInput(inputId="k6.bisp.uptake", label = "maximum carb uptake rate by A. bisporus (/d)", min = 0.01, max = 1.0, step = 0.01, value = parms$k6.bisp.uptake)     
+                   ),
+             ),
+       ),
+
+       conditionalPanel(condition = "input.tabselected == 3",
+             fluidRow(
+                   column(12,
+                         sliderInput(inputId="k7.fun.killing.bac", label = "maximum predation rate constant, fungi > bacteria (/d)", min = 0.01, max = 1.0, step = 0.01, value = parms$k7.fun.killing.bac),
+                         sliderInput(inputId="k8.bisp.killing.bac", label = "maximum predation rate constant, A. bisporus > bacteria (/d)", min = 0.01, max = 1.0, step = 0.01, value = parms$k8.bisp.killing.bac),
+                         sliderInput(inputId="k9.bisp.killing.fun", label = "maximum predation rate constant, A. bisporus > fungi (/d)", min = 0.01, max = 1.0, step = 0.01, value = parms$k9.bisp.killing.fun)   
+                   ),
+             ),
+       ),
+            
+       conditionalPanel(condition = "input.tabselected == 4",
+             fluidRow(
+                   column(12,
+                         sliderInput(inputId="k10.bac.mort", label = "bacterial linear mortality constant [(mmol C per cubic meter)/d]", min = 0.01, max = 1.0, step = 0.01, value = parms$k10.bac.mort),
+                         sliderInput(inputId="k11.fun.mort", label = "fungal linear mortality constant [(mmol C per cubic meter)/d]",   min = 0.01, max = 1.0, step = 0.01, value = parms$k11.fun.mort),
+                         sliderInput(inputId="k12.bisp.mort", label = "A. bisporus linear mortality constant [(mmol C per cubic meter)/d]", min = 0.01, max = 1.0, step = 0.01, value = parms$k12.bisp.mort) 
+                   ),
+             ),
+       ),        
+
+       conditionalPanel(condition = "input.tabselected == 5",
+             fluidRow(
+                   column(12,
+                         sliderInput(inputId="kBISPORUS", label = "Monod constant for A. bisporus (mmol C per cubic meter)", min = 0.01, max = 1.0, step = 0.01, value = parms$kBISPORUS),
+                         sliderInput(inputId="MAX.A.BISPORUS", label = "maximum unlimited A. bisporus growth (mmol C per cubic meter)", min = 0.01, max = 5.0, step = 0.1, value = parms$MAX.A.BISPORUS),
+                         sliderInput(inputId="kSUGARS.bac", label = "bacterial growth limit (mmol C per cubic meter)", min = 0.01, max = 2.0, step = 0.01, value = parms$kSUGARS.bac),
+                         sliderInput(inputId="kSUGARS.fun", label = "fungal growth limit (mmol C per cubic meter)", min = 0.01, max = 2.0, step = 0.01, value = parms$kSUGARS.fun),
+                         sliderInput(inputId="kSUGARS.bisp", label = "A. bisporus growth limit (mmol C per cubic meter)", min = 0.01, max = 2.0, step = 0.01, value = parms$kSUGARS.bisp) 
+                   ),
+             ),
+       ),
+
+       conditionalPanel(condition = "input.tabselected == 6",
+             fluidRow(
+                   column(12,
+                         sliderInput(inputId="Ef.bac", label = "%C assimilated by bacteria due to eating (-)", min = 0.01, max = 1.0, step = 0.01, value = parms$Ef.bac),
+                         sliderInput(inputId="Ef.fun", label = "%C assimilated by fungi due to eating (-)", min = 0.01, max = 1.0, step = 0.01, value = parms$Ef.fun),
+                         sliderInput(inputId="Ef.bisp", label = "%C assimilated by A. bisporus due to eating (-)", min = 0.01, max = 1.0, step = 0.01, value = parms$Ef.bisp)
+                   ),
+             ),
+       ),
+       
+       conditionalPanel(condition = "input.tabselected == 7",
+             fluidRow(
+                   column(12,
+                         sliderInput(inputId="BACTERIA", label = "starting bacterial biomass", min = 0.01, max = 0.9, step = 0.01, value = state$BACTERIA),                      #0.33 is default value
+                         sliderInput(inputId="FUNGI", label = "starting fungal biomass", min = 0.01, max = 0.9, step = 0.01, value = state$FUNGI),                                 #0.2655 is default value
+                         sliderInput(inputId="A.BISPORUS", label = "starting A. bisporus biomass", min = 0.01, max = 0.9, step = 0.01, value = state$A.BISPORUS),                    #0.15 is default value
+                         sliderInput(inputId="SUGARS", label = "starting amount of sugars in compost", min = 1, max = 5, step = 0.1, value = state$SUGARS),                        #3.9 is default value
+                         sliderInput(inputId="COMPOST", label = "starting amount of polysaccharides in compost", min = 5, max = 20, step = 1, value = state$COMPOST),             #15 is default value
+                         sliderInput(inputId="CO2", label = "respired carbon dioxide due to biological activities", min = 0, max = 5, step = 0.1, value = state$CO2)                #0 is default value
+                   ),
+             ),
+       ),
    
    actionButton (inputId="resetButton", label="Reset Parameters"),
     
    checkboxInput(inputId="defaultRun",  label=strong("Add default run?"), value=TRUE),
-   br()
-  ),
+   br(),
+   )
 
-  mainPanel(
-      plotOutput("PlotSi"))
-))
-
+    })
+  )
+)
 #-------------------------------------------------------------------------------------------------------
-Server.Si <- shinyServer(function(input, output, session) {
+server <- function(input, output, session) {
+
+#ties the UI coded above to the server  
+  output$WB <- renderUI({  
+    CreateUI})
 
 #----------------------------------------Reset button definition----------------------------------------
   observeEvent(input$resetButton, {
+    #resets parameters
     updateNumericInput(session, "k1.deg.bac",             value = parms$k1.deg.bac)
     updateNumericInput(session, "k2.deg.fun",             value = parms$k2.deg.fun)
     updateNumericInput(session, "k3.deg.bisp",            value = parms$k3.deg.bisp)
@@ -238,9 +316,16 @@ Server.Si <- shinyServer(function(input, output, session) {
     updateNumericInput(session, "Ef.bac",                 value = parms$Ef.bac)
     updateNumericInput(session, "Ef.fun",                 value = parms$Ef.fun)
     updateNumericInput(session, "Ef.bisp",                value = parms$Ef.bisp)
+    #resets state variables
+    updateNumericInput(session, "BACTERIA",               value = state$BACTERIA)
+    updateNumericInput(session, "FUNGI",                  value = state$FUNGI)
+    updateNumericInput(session, "A.BISPORUS",             value = state$A.BISPORUS)
+    updateNumericInput(session, "SUGARS",                 value = state$SUGARS)
+    updateNumericInput(session, "COMPOST",                value = state$COMPOST)
+    updateNumericInput(session, "CO2",                    value = state$CO2)
   })
 
-#-------------------Acquires model parameters which are defined in the user interface-------------------
+#-------------------Acquires model parameters and state variables which are defined in the user interface-
   getparms <- reactive( {
     newparms                        <- parms 
     newparms$k1.deg.bac             <- input$k1.deg.bac
@@ -266,32 +351,31 @@ Server.Si <- shinyServer(function(input, output, session) {
     newparms
   })
 
+  getstate <- reactive( {
+    newstate                        <- state
+    newstate$BACTERIA               <- input$BACTERIA
+    newstate$FUNGI                  <- input$FUNGI 
+    newstate$A.BISPORUS             <- input$A.BISPORUS
+    newstate$SUGARS                 <- input$SUGARS
+    newstate$COMPOST                <- input$COMPOST 
+    newstate$CO2                    <- input$CO2
+    newstate
+  })
 #------------------------------------------Defines the plot tab------------------------------------------
-  output$PlotSi <- renderPlot({
+  output$PlotWB <- renderPlot({
 
-   newparms     <- getparms()                    
-   out          <- ode(y = state, parms = newparms, func = WHITEBUTTON, times = outtimes)
+   newparms     <- getparms()
+   newstate     <- getstate()
+   out          <- ode(y = unlist(newstate), parms = newparms, func = WHITEBUTTON, times = outtimes)
 
    if (input$defaultRun) {
-      plot (out, defaultprog, which=c("BACTERIA", "FUNGI", "A.BISPORUS", "SUGARS", "COMPOST", "CO2"), lwd = 2, las = 1, lty = 1,                        cex.main = 1.5, cex.axis = 1.25, cex.lab = 1.25)  
+      plot (out, defaultprog, which=c("BACTERIA", "FUNGI", "A.BISPORUS", "SUGARS", "COMPOST", "CO2"), lwd = 2, las = 1, lty = 1, cex.main = 1.5, cex.axis = 1.25, cex.lab = 1.25)  
       legend("bottomright", legend = c("new", "default"), cex = 1.5, col = 1:2, lty = 1)
     } else  
       plot (out, lwd = 2, las = 1, lty = 1, cex.main = 1.5, cex.axis = 1.25, cex.lab = 1.25)  
    })                          
-})     
+}     
 
 #--------------------------------------------------------------------------------------------------------
-shinyApp(ui = UI.Si, server = Server.Si)
-#----------------------------------------hacks to display better-----------------------------------------
-
-#in div class="form-group shiny-input-container" add
-# .form-group{
-#  padding-top: 10px;
-# }
-
-#in label class="control-label", or essentially the one below the above container add
-# .control-label{
-#  margin-bottom: 3em;
-# }
-#--------------------------------------------------------------------------------------------------------
+shinyApp(ui, server)
 ```
