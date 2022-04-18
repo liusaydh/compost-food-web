@@ -50,3 +50,13 @@ SUGARS | amount of sugars present at Phase III start as available monosaccharide
 COMPOST | amount of total carbon present at Phase III start, mostly as undegraded polysaccharides | grams | 12 - 15 | Vîtă, 2022. | 30% carbon in 45 grams compost
 CO2 | amount of carbon dioxide present at Phase III start as a result of respiration | (-) | 0 | Vîtă (van Dam), 2022. |
 C.INI | amount of total carbon present in the system at Phase III start | grams | 12 - 15 | Vîtă, 2022. | same value as compost, used for easier calculation only
+
+An extension of this basic model comes from labelling experiments, where labelled, or <sup>13</sup>C carbon is added, as a one-off injection, to the pool of what is otherwise predominantly naturally abundant <sup>12</sup>C carbon. The surplus <sup>13</sup>C starts to be uptaken by the living biomass in the compost.
+
+As the time of the experiment progresses, surplus <sup>13</sup>C accumulates in the biomass of the living organisms that uptake it. For the second trophic step, living organisms that eat other living organisms incorporate their biomass labelling, as well.
+
+Finally, surplus <sup>13</sup>C gets respired, incorporated and accumulates further in the biomass.
+
+
+
+
