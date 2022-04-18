@@ -1,6 +1,8 @@
 # compost-food-web
 Mushroom compost food web modelling in R, supplemented by nematode analysis.
 
+<h2> Natural abundance (carbon flow based) food web model </h2>
+
 This is the most basic extant model for an "artificial" mushroom compost model. Artificial, due to the fact that it is a food web not commonly found in nature, but rather an achievement of dozens and hundreds of years of selective breeding and composting to achieve perfect conditions in which to raise _Agaricus bisporus_ to a commercially viable extent. 
 
 As an artificial environment, specifically created to maximally propagate a single living organism, this food web is likewise truncated in comparison to any natural counterpart. The microbiota (pre-extant bacteria and fungi) are altered through processes of casing and aerating, changing the humidity and temperature and affecting entire generations and types of microbial fauna present. Likewise, some larger critters are not present (centipedes, mites, beetles, snails), as well as entire populations of common pests (aphids, flies). 
@@ -15,6 +17,37 @@ As an artificial environment, specifically created to maximally propagate a sing
 As such, the food web comes down to several factors: fungal populations, bacterial populations, _A. bisporus_ populations, nematode populations, recalcitrant sources of carbohydrates and lignin, readily available sources of broken down sugars, and carbon dioxide respired.
 
 In its first functional form, the food web is modeled to exclude nematode populations, as they add an additional layer of higher trophic predatory complexity as both first and second level consumers. This documentation serves to both explain the model and serve as a repository of parameters. Some of the parameters are relied upon from (scarce) literature on the subject, while others are heavily inferred from a combination of literature sources or inferred from the outputs of the model itself. The table below serves to denote these sources and any comments on parameters found and their overall reliability.
+
+<h2> <sup>13</sup>C model addition </h2>
+
+An extension of this basic model comes from labelling experiments, where labelled, or <sup>13</sup>C carbon is added, as a one-off injection in the form of sugars, to the pool of what is otherwise predominantly naturally abundant <sup>12</sup>C monosaccharide carbon. The surplus <sup>13</sup>C starts to be uptaken by the living biomass in the compost.
+
+<p align="center">
+  <img 
+    width="800"
+    src="flowcharts/injection.png"
+  >
+</p>
+
+As the time of the experiment progresses, surplus <sup>13</sup>C accumulates in the biomass of the living organisms that uptake it. For the second trophic step, living organisms that eat other living organisms incorporate their biomass labelling, as well.
+
+<p align="center">
+  <img 
+    width="800"
+    src="flowcharts/incorporation.png"
+  >
+</p>
+
+Finally, surplus <sup>13</sup>C gets respired, incorporated and accumulates further in the biomass.
+
+<p align="center">
+  <img 
+    width="800"
+    src="flowcharts/spread.png"
+  >
+</p>
+
+<h2> Natural abundance parameters and state variables </h2>
 
 Parameter | Description | Unit | Value | Source(s) | Comments |
 --- | --- | --- | --- |--- |--- |
@@ -50,12 +83,6 @@ SUGARS | amount of sugars present at Phase III start as available monosaccharide
 COMPOST | amount of total carbon present at Phase III start, mostly as undegraded polysaccharides | grams | 12 - 15 | Vîtă, 2022. | 30% carbon in 45 grams compost
 CO2 | amount of carbon dioxide present at Phase III start as a result of respiration | (-) | 0 | Vîtă (van Dam), 2022. |
 C.INI | amount of total carbon present in the system at Phase III start | grams | 12 - 15 | Vîtă, 2022. | same value as compost, used for easier calculation only
-
-An extension of this basic model comes from labelling experiments, where labelled, or <sup>13</sup>C carbon is added, as a one-off injection, to the pool of what is otherwise predominantly naturally abundant <sup>12</sup>C carbon. The surplus <sup>13</sup>C starts to be uptaken by the living biomass in the compost.
-
-As the time of the experiment progresses, surplus <sup>13</sup>C accumulates in the biomass of the living organisms that uptake it. For the second trophic step, living organisms that eat other living organisms incorporate their biomass labelling, as well.
-
-Finally, surplus <sup>13</sup>C gets respired, incorporated and accumulates further in the biomass.
 
 
 
