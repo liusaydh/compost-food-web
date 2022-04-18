@@ -1,6 +1,0 @@
-"0","plot(model_output, mfrow=c(1,3), which=c(""TOTAL_C"", ""R4.bac.uptake"", ""R5.fun.uptake""))"
-"2","Warning in plot.window(...) :"
-"2","
- "
-"2"," relative range of values (  29 * EPS) is small (axis 2)
-"
