@@ -250,8 +250,8 @@ ui <- fluidPage(fluid = TRUE,
 #aligns the plot at the center and resizes it to a nice size for both browser and RStudio launcher    
    mainPanel(
      fluidRow(
-          column(12, offset = 3, align="center",
-      plotOutput("PlotWB", height = "500px")
+          column(12, offset = 2, align="center",
+      plotOutput("PlotWB", height = "700px", width = "700px")
           )
      )
    ),
