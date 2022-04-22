@@ -76,13 +76,13 @@ In addition, the system has starting state variables which are conditions that a
 
 State variable | Description | Unit | Value | Source(s) | Comments |
 --- | --- | --- | --- |--- |--- |
-BACTERIA | biomass of bacteria present at Phase III start | (-) | 1.4% - 2.2% of compost | Vos, 2017., Vîtă, 2022. |
-FUNGI | biomass of fungi (excluding _A. bisporus_) present at Phase III start | (-) | 1.77% of compost | Vos, 2017. |
-A.BISPORUS | biomass of _A. bisporus_ present at Phase III start | (-) | 0.01% of compost | Vos, 2017., Vîtă, 2022. | technically, _A. bisporus_ biomass is zero because only he inoculate on rye grain is present, not the mycelium
-SUGARS | amount of sugars present at Phase III start as available monosaccharides | (-) | 26% of compost (w/w) | Jurak, 2013. |
-COMPOST | amount of total carbon present at Phase III start, mostly as undegraded polysaccharides | grams | 12 - 15 | Vîtă, 2022. | 30% carbon in 45 grams compost
-CO2 | amount of carbon dioxide present at Phase III start as a result of respiration | (-) | 0 | Vîtă (van Dam), 2022. |
-C.INI | amount of total carbon present in the system at Phase III start | grams | 12 - 15 | Vîtă, 2022. | same value as compost, used for easier calculation only
+BACTERIA | biomass of bacteria present at Phase III start | mmol C/g compost | 1.475 | Vos, 2017., Vîtă, 2022. | 1.4% - 2.2% of compost, 17.7 mg C/g compost
+FUNGI | biomass of fungi (excluding _A. bisporus_) present at Phase III start | mmol C/g compost | 1.17 - 1.83 | Vos, 2017. | 1.77% of compost , 14 - 22 mg C/g compost
+A.BISPORUS | biomass of _A. bisporus_ present at Phase III start | mmol C/g compost | 0.008357 | Vos, 2017., Vîtă, 2022. | technically, _A. bisporus_ biomass is zero because only he inoculate on rye grain is present, not the mycelium, but value is calculated as 0.01% of compost
+SUGARS | amount of sugars present at Phase III start as available monosaccharides | mmol C/g compost | 8.58222 | Jurak, 2013. | 26% of compost (w/w), gives 12 grams carbs in 45 grams compost
+COMPOST | amount of total carbon present at Phase III start, mostly as undegraded polysaccharides | mmol C/g compost | 25 | Vîtă, 2022. | 30% carbon in 45 grams compost, gives 13.5 grams carbon
+CO2 | amount of carbon dioxide present at Phase III start as a result of respiration | mmol C/g compost | 0 | Vîtă (van Dam), 2022. |
+C.INI | amount of total carbon present in the system at Phase III start | mmol C/g compost | 25 | Vîtă, 2022. | same value as compost, used for easier calculation only
 
 
 
