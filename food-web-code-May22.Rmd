@@ -1,0 +1,481 @@
+---
+title: "Working model without (nematodes, 13C version), with (literature parameters, PRETTY interactive UI, calibrated parameters, literature state variables)."
+author: "Lucy"
+date: "13/04/2022"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Model setup
+
+Loading the libraries necessary, deSolve for the run of the model and shiny for the interactive UI.
+
+```{r}
+##------------------------------------------------block library loading-----------------------------------------------------
+require(base)
+require(datasets)
+require(deSolve)
+require(graphics)
+require(grDevices)
+require(methods)
+require(shiny)
+require(shinyWidgets)
+require(stats)
+require(utils)
+##---------------------------------------------end of block library loading-------------------------------------------------
+```
+
+Definition of initial state variables, initial parameters for the default model run.
+
+```{r}
+##----------------------------------------block state variables and parameters----------------------------------------------
+
+#----------------------------------------initial natural abundance state variables------------------------------------------
+#C.INI <- 15 (300/180*6 or 12-14) - this is an old value which is equal to unlabeled compost
+#previously looked like this: state <- c(BACTERIA = 0.022*C.INI, FUNGI = 0.0177*C.INI, A.BISPORUS = 0.01*C.INI, SUGARS = 0.26*C.INI, COMPOST = C.INI, CO2 = 0)
+#state variables were made to be a list, not a vector using c(), they are unlisted for the ode function where necessary as ode only takes y which is numeric, but UI takes only state variables as a named list
+#for the same reason, values of state variables are now numbers instead of percentages, but the values are based on COMPOST = 15 still, just recalculated to fit right from previous percentages
+
+#excess 13C as calculated experimentally from PLFAs and other experiments, can be seen as amount of substance fractions x13C = COMPARTMENT.13C/COMPARTMENT
+#in mmol/g compost
+e.bac      = 8.708494e-9
+e.fun      = 3.670853e-9
+e.bisp     = 1.007484526275729929e-14
+e.sugars   = 1.8061e-12
+e.co2      = 8.059371e-12
+
+
+state     <- list(BACTERIA       = 1.475,
+                  BACTERIA.13C   = 1.475*e.bac,
+                  FUNGI          = 1.6, 
+                  FUNGI.13C      = 1.6*e.fun, 
+                  A.BISPORUS     = 0.008357, 
+                  A.BISPORUS.13C = 0.008357*e.bisp, 
+                  SUGARS         = 8.58222, 
+                  SUGARS.13C     = 8.58222*e.sugars, 
+                  COMPOST        = 25, 
+                  CO2            = 0.00001,
+                  CO2.13C        = 0.00001*e.co2 
+)
+
+#-------------------------------------parameters that comprise rate laws of processes go here--------------------------------
+
+parms <- list(k1.deg.bac          = 0.05,             #0.05 - 0.15, literature value
+              k2.deg.fun          = 0.05,             #0.05 - 0.15, literature value
+              k3.deg.bisp         = 0.01,             #0.075 - 0.13, literature value
+              k4.bac.uptake       = 0.1,              #0.04 - 0.1, literature value
+              k5.fun.uptake       = 0.05,             #0.01 - 0.05, literature value
+              k6.bisp.uptake      = 0.15,             #needs calibration, actually unknown, placeholder value used
+              k7.fun.killing.bac  = 0.2,              #needs calibration, actually unknown, placeholder value used
+              k8.bisp.killing.bac = 0.1,              #needs calibration, actually unknown, placeholder value used
+              k9.bisp.killing.fun = 0.5,              #needs calibration, actually unknown, placeholder value used
+              k10.bac.mort        = 0.24,             #0.24 - 0.72, literature value
+              k11.fun.mort        = 0.1,              #0.01 - 0.1, literature value
+              k12.bisp.mort       = 0.01,             #literature value
+              kBISPORUS           = 0.5,              #needs calibration, actually unknown, placeholder value used
+              MAX.A.BISPORUS      = 1,                #needs calibration, actually unknown, placeholder value used
+              kSUGARS.bac         = 0.4,              #needs calibration, actually unknown, placeholder value used
+              kSUGARS.fun         = 0.4,              #needs calibration, actually unknown, placeholder value used
+              kSUGARS.bisp        = 0.2,              #needs calibration, actually unknown, placeholder value used
+              Ef.fun              = 0.3,              #literature value
+              Ef.bac              = 0.3,              #literature value
+              Ef.bisp             = 0.4               #literature value
+)
+
+##---------------------------------------end of block state variables, parameters---------------------------------------------
+```
+
+Definition of the model function and the output of the model.
+
+```{r}
+##-------------------------------------------block model definition-----------------------------------------------------------
+WHITEBUTTON <- function(t, state, parameters) { 
+  with(as.list(c(state, parameters)),{
+    
+      x13C.bac            <- BACTERIA.13C/BACTERIA
+      x13C.fun            <- FUNGI.13C/FUNGI
+      x13C.bisp           <- A.BISPORUS.13C/A.BISPORUS
+      x13C.sugars         <- SUGARS.13C/SUGARS
+      x13C.co2            <- CO2.13C/CO2
+ 
+#------------------------Rate expressions - all in units of [mmolC/m3/day] or [mmolC/g compost] go here-----------------------
+    
+      R1.deg.bac          <- k1.deg.bac * BACTERIA
+      R2.deg.fun          <- k2.deg.fun * FUNGI
+      R3.deg.bisp         <- k3.deg.bisp * A.BISPORUS
+      R4.bac.uptake       <- k4.bac.uptake * SUGARS/(SUGARS+kSUGARS.bac) * BACTERIA * kBISPORUS/(A.BISPORUS+kBISPORUS)
+      R5.fun.uptake       <- k5.fun.uptake * SUGARS/(SUGARS+kSUGARS.fun) * FUNGI * kBISPORUS/(A.BISPORUS+kBISPORUS)
+      R6.bisp.uptake      <- k6.bisp.uptake * SUGARS/(SUGARS+kSUGARS.bisp) * A.BISPORUS * (1-A.BISPORUS/MAX.A.BISPORUS)
+      R7.fun.killing.bac  <- k7.fun.killing.bac * BACTERIA * FUNGI
+      R8.bisp.killing.bac <- k8.bisp.killing.bac * BACTERIA * A.BISPORUS
+      R9.bisp.killing.fun <- k9.bisp.killing.fun * FUNGI * A.BISPORUS
+      R10.bac.mort        <- k10.bac.mort * BACTERIA
+      R11.fun.mort        <- k11.fun.mort * FUNGI
+      R12.bisp.mort       <- k12.bisp.mort * A.BISPORUS
+      
+#--------------------------------Mass balances [molC/m3/day or molC/kg/day] go here-------------------------------------------
+      
+#mass balances are first given for unlabeled then for labelled model versions, rates are multiplied w/ fraction of the source
+      
+      dBACTERIA       <- Ef.bac*R4.bac.uptake - 
+                         R7.fun.killing.bac -
+                         R8.bisp.killing.bac - 
+                         R10.bac.mort 
+                     
+      dBACTERIA.13C   <- Ef.bac*R4.bac.uptake*x13C.sugars - 
+                         R7.fun.killing.bac*x13C.bac -
+                         R8.bisp.killing.bac*x13C.bac - 
+                         R10.bac.mort*x13C.bac
+      
+      dFUNGI          <- Ef.fun*R5.fun.uptake - 
+                         R9.bisp.killing.fun - 
+                         R11.fun.mort
+      
+      dFUNGI.13C      <- Ef.fun*R5.fun.uptake*x13C.sugars - 
+                         R9.bisp.killing.fun*x13C.fun - 
+                         R11.fun.mort*x13C.fun
+      
+      dA.BISPORUS     <- Ef.bisp*R6.bisp.uptake - 
+                         R12.bisp.mort
+      
+      dA.BISPORUS.13C <- Ef.bisp*R6.bisp.uptake*x13C.sugars -
+                         R12.bisp.mort*x13C.bisp
+      
+      dSUGARS         <- R1.deg.bac + 
+                         R2.deg.fun + 
+                         R3.deg.bisp -
+                         R4.bac.uptake - 
+                         R5.fun.uptake - 
+                         R6.bisp.uptake + 
+                         R7.fun.killing.bac + 
+                         R8.bisp.killing.bac + 
+                         R9.bisp.killing.fun +
+                         R10.bac.mort + 
+                         R11.fun.mort + 
+                         R12.bisp.mort
+      
+      dSUGARS.13C     <- R1.deg.bac + 
+                         R2.deg.fun + 
+                         R3.deg.bisp -
+                         R4.bac.uptake*x13C.sugars - 
+                         R5.fun.uptake*x13C.sugars - 
+                         R6.bisp.uptake*x13C.sugars + 
+                         R7.fun.killing.bac*x13C.bac + 
+                         R8.bisp.killing.bac*x13C.bac + 
+                         R9.bisp.killing.fun*x13C.fun +
+                         R10.bac.mort*x13C.bac + 
+                         R11.fun.mort*x13C.fun + 
+                         R12.bisp.mort*x13C.bisp
+      
+      #no label in compost!
+      dCOMPOST        <- -R1.deg.bac - R2.deg.fun - R3.deg.bisp
+        
+      dCO2            <- (1-Ef.bac)*R4.bac.uptake + 
+                         (1-Ef.fun)*R5.fun.uptake + 
+                         (1-Ef.bisp)*R6.bisp.uptake
+
+      dCO2.13C        <- (1-Ef.bac)*R4.bac.uptake*x13C.sugars + 
+                         (1-Ef.fun)*R5.fun.uptake*x13C.sugars + 
+                         (1-Ef.bisp)*R6.bisp.uptake*x13C.sugars
+      
+      TOTAL_C         <- COMPOST + BACTERIA     + SUGARS     + FUNGI     + A.BISPORUS     + CO2
+      TOTAL_C.13C     <-           BACTERIA.13C + SUGARS.13C + FUNGI.13C + A.BISPORUS.13C + CO2.13C
+      
+#----------------------------------------------Model output--------------------------------------------------------------------
+      
+      return (list(c(dBACTERIA, dBACTERIA.13C, dFUNGI, dFUNGI.13C, dA.BISPORUS, dA.BISPORUS.13C, dSUGARS, dSUGARS.13C, dCOMPOST, dCO2, dCO2.13C),
+                   TOTAL_C         = TOTAL_C, 
+                   TOTAL_C.13C     = TOTAL_C.13C
+                   )
+              )
+      })
+}
+
+##-------------------------------------------end of block model definition------------------------------------------------------
+```
+
+Model is ran and the results are plotted separately - argument which defines the output to model change of individually selected parameters that wish to be tracked through the duration of the dynamic model.
+
+```{r}
+##---------------------------------------------block model run with deSolve-----------------------------------------------------
+
+outtimes     <- seq(from = 0, to = 40, length.out = 1000)
+model_output <- ode(y = unlist(state), parms = parms, func = WHITEBUTTON, times = outtimes) #unlisted to use with ode, as mentioned
+
+##-------------------------------------------end of block model run with deSolve------------------------------------------------
+```
+
+```{r, fig.height=4, fig.width=8}
+##---------------------------------------------block model output plotting------------------------------------------------------
+
+plot(model_output, xlab="time (days)", mfrow=c(1,3), which=c("BACTERIA", "BACTERIA.13C", "FUNGI", "FUNGI.13C", "A.BISPORUS", "A.BISPORUS.13C"))
+plot(model_output, xlab="time (days)", mfrow=c(1,3), which=c("SUGARS", "SUGARS.13C", "COMPOST", "CO2", "CO2.13C"))
+plot(model_output, xlab="time (days)", mfrow=c(1,3), which=c("TOTAL_C", "TOTAL_C.13C"))
+
+##---------------------------------------------block model output plotting------------------------------------------------------
+```
+
+Lastly, some code can be added in order to make the output interactive and open im a browser, where parameters can be edited in real time.
+
+```{r}
+##---------------------------------------------block interactive user interface-------------------------------------------------
+
+#-------------------------------------------------------------------------------------------------------------------------------
+
+state       <- state
+times       <- outtimes
+defaultprog <- ode(y = unlist(state), times = outtimes, func = WHITEBUTTON, parms = parms) #unlisted to use with ode
+
+#------------------------------------------------ui-side part of the code-------------------------------------------------------
+
+ui <- fluidPage(fluid = TRUE,
+
+#title, centered
+
+  titlePanel( 
+    h1("Compost Food Web Interactive Simulation", windowTitle = "Compost Food Web Interactive Simulation", align = "center")
+  ),
+  
+#UI output
+  uiOutput("WB"),
+
+#sidebar and tabs
+  sidebarLayout(
+
+#aligns the plot at the center and resizes it to a nice size for both browser and RStudio launcher    
+   mainPanel(
+     fluidRow(
+          column(12, offset = 3, align="center",
+      plotOutput("PlotWB", height = "500px")
+          )
+     )
+   ),
+      
+ #creates UI using javascript conditionalPanel tests, bunches terms together under a single tab based on conditions
+   CreateUI <- renderUI({  
+    sidebarPanel(width = 12,
+       tabsetPanel(id = "tabselected",
+                   tabPanel(strong("degradation"),        value = 1, helpText("degradation of polysaccharides from compost")),
+                   tabPanel(strong("uptake"),             value = 2, helpText("mono-sugar uptake")),
+                   tabPanel(strong("predation"),          value = 3, helpText("predation rates")),
+                   tabPanel(strong("mortality"),          value = 4, helpText("mortality rates")),
+                   tabPanel(strong("Monod"),              value = 5, helpText("Monod (Michaelis-Menten) kinetics")),
+                   tabPanel(strong("efficiency"),         value = 6, helpText("uptake efficiency of sugars")),
+                   tabPanel(strong("initial states, L-"), value = 7, helpText("initial state variables (amounts and biomasses), natural abundance")),
+                   tabPanel(strong("initial states, L+"), value = 8, helpText("initial state variables (amounts and biomasses), labelled")),
+       ),
+
+#be VERY CAREFUL with the indentation of conditional panels, otherwise nothing will ever work          
+       conditionalPanel(condition = "input.tabselected == 1",
+            fluidRow(
+                  column(12,
+                         sliderInput(inputId="k1.deg.bac", label = "degradation into sugars by bacteria (/d)", min = 0.01, max = 1.0, step = 0.01, value = parms$k1.deg.bac),
+                         sliderInput(inputId="k2.deg.fun", label = "degradation into sugars by fungi (/d)", min = 0.01, max = 1.0, step = 0.01, value = parms$k2.deg.fun),
+                         sliderInput(inputId="k3.deg.bisp",label = "degradation into sugars by A. bisporus (/d)", min = 0.01, max = 1.0, step = 0.01, value = parms$k3.deg.bisp)       
+                  ),
+            ),
+       ),
+
+       conditionalPanel(condition = "input.tabselected == 2",
+             fluidRow(
+                   column(12,
+                         sliderInput(inputId="k4.bac.uptake", label = "maximum carb uptake rate by bacteria (/d)", min = 0.01, max = 1.0, step = 0.01, value = parms$k4.bac.uptake),
+                         sliderInput(inputId="k5.fun.uptake", label = "maximum carb uptake rate by fungi (/d)", min = 0.01, max = 1.0, step = 0.01, value = parms$k5.fun.uptake),
+                         sliderInput(inputId="k6.bisp.uptake", label = "maximum carb uptake rate by A. bisporus (/d)", min = 0.01, max = 1.0, step = 0.01, value = parms$k6.bisp.uptake)     
+                   ),
+             ),
+       ),
+
+       conditionalPanel(condition = "input.tabselected == 3",
+             fluidRow(
+                   column(12,
+                         sliderInput(inputId="k7.fun.killing.bac", label = "maximum predation rate constant, fungi > bacteria (/d)", min = 0.01, max = 1.0, step = 0.01, value = parms$k7.fun.killing.bac),
+                         sliderInput(inputId="k8.bisp.killing.bac", label = "maximum predation rate constant, A. bisporus > bacteria (/d)", min = 0.01, max = 1.0, step = 0.01, value = parms$k8.bisp.killing.bac),
+                         sliderInput(inputId="k9.bisp.killing.fun", label = "maximum predation rate constant, A. bisporus > fungi (/d)", min = 0.01, max = 1.0, step = 0.01, value = parms$k9.bisp.killing.fun)   
+                   ),
+             ),
+       ),
+            
+       conditionalPanel(condition = "input.tabselected == 4",
+             fluidRow(
+                   column(12,
+                         sliderInput(inputId="k10.bac.mort", label = "bacterial linear mortality constant [(mmol C per cubic meter)/d]", min = 0.01, max = 1.0, step = 0.01, value = parms$k10.bac.mort),
+                         sliderInput(inputId="k11.fun.mort", label = "fungal linear mortality constant [(mmol C per cubic meter)/d]",   min = 0.01, max = 1.0, step = 0.01, value = parms$k11.fun.mort),
+                         sliderInput(inputId="k12.bisp.mort", label = "A. bisporus linear mortality constant [(mmol C per cubic meter)/d]", min = 0.01, max = 1.0, step = 0.01, value = parms$k12.bisp.mort) 
+                   ),
+             ),
+       ),        
+
+       conditionalPanel(condition = "input.tabselected == 5",
+             fluidRow(
+                   column(12,
+                         sliderInput(inputId="kBISPORUS", label = "Monod constant for A. bisporus (mmol C per cubic meter)", min = 0.01, max = 1.0, step = 0.01, value = parms$kBISPORUS),
+                         sliderInput(inputId="MAX.A.BISPORUS", label = "maximum unlimited A. bisporus growth (mmol C per cubic meter)", min = 0.01, max = 5.0, step = 0.1, value = parms$MAX.A.BISPORUS),
+                         sliderInput(inputId="kSUGARS.bac", label = "bacterial growth limit (mmol C per cubic meter)", min = 0.01, max = 2.0, step = 0.01, value = parms$kSUGARS.bac),
+                         sliderInput(inputId="kSUGARS.fun", label = "fungal growth limit (mmol C per cubic meter)", min = 0.01, max = 2.0, step = 0.01, value = parms$kSUGARS.fun),
+                         sliderInput(inputId="kSUGARS.bisp", label = "A. bisporus growth limit (mmol C per cubic meter)", min = 0.01, max = 2.0, step = 0.01, value = parms$kSUGARS.bisp) 
+                   ),
+             ),
+       ),
+
+       conditionalPanel(condition = "input.tabselected == 6",
+             fluidRow(
+                   column(12,
+                         sliderInput(inputId="Ef.bac", label = "%C assimilated by bacteria due to eating (-)", min = 0.01, max = 1.0, step = 0.01, value = parms$Ef.bac),
+                         sliderInput(inputId="Ef.fun", label = "%C assimilated by fungi due to eating (-)", min = 0.01, max = 1.0, step = 0.01, value = parms$Ef.fun),
+                         sliderInput(inputId="Ef.bisp", label = "%C assimilated by A. bisporus due to eating (-)", min = 0.01, max = 1.0, step = 0.01, value = parms$Ef.bisp)
+                   ),
+             ),
+       ),
+       
+       conditionalPanel(condition = "input.tabselected == 7",
+             fluidRow(
+                   column(12,
+                         sliderInput(inputId="BACTERIA", label = "starting bacterial biomass", min = 0.1, max = 3, step = 0.001, value = state$BACTERIA),                                                                                        #1.475 is the default value
+                         sliderInput(inputId="FUNGI", label = "starting fungal biomass", min = 0.1, max = 3, step = 0.01, value = state$FUNGI),                                                                                                  #1.6 is the default value
+                         sliderInput(inputId="A.BISPORUS", label = "starting A. bisporus biomass", min = 0.001, max = 0.01, step = 0.001, value = state$A.BISPORUS),                                                                             #0.008357 is the default value
+                         sliderInput(inputId="SUGARS", label = "starting amount of sugars in compost", min = 3, max = 13, step = 0.1, value = state$SUGARS),                                                                                     #8.58222 is the default value
+                         sliderInput(inputId="COMPOST", label = "starting amount of polysaccharides in compost", min = 10, max = 40, step = 1, value = state$COMPOST),                                                                           #25 is the default value
+                         sliderInput(inputId="CO2", label = "respired carbon dioxide due to biological activities", min = 0, max = 5, step = 0.01, value = state$CO2)                                                                            #0 is the default value
+                   ),
+             ),
+       ),
+
+       conditionalPanel(condition = "input.tabselected == 8",
+             fluidRow(
+                   column(12,
+                         sliderInput(inputId="BACTERIA.13C", label = "labelled bacterial biomass", min = 1e-9, max = 1e-7, step = 1e-10, value = state$BACTERIA.13C),                                                                            #1.284503e-08 is the default value
+                         sliderInput(inputId="FUNGI.13C", label = "labelled fungal biomass", min = 1e-10, max = 1e-8, step = 1e-11, value = state$FUNGI.13C),                                                                                    #5.873365e-09 is the default value
+                         sliderInput(inputId="A.BISPORUS.13C", label = "labelled A. bisporus biomass", min = 1e-18, max = 1e-16, step = 1e-19, value = state$A.BISPORUS.13C),                                                                    #8.419548e-17 is the default value
+                         sliderInput(inputId="SUGARS.13C", label = "starting amount of labelled sugars in compost", min = 1e-12, max = 1e-10, step = 1e-13, value = state$SUGARS.13C),                                                           #1.550035e-11 is the default value
+                         sliderInput(inputId="CO2.13C", label = "respired labelled carbon dioxide due to biological activities", min = 1e-18, max = 1e-16, step = 1e-19, value = state$CO2.13C)                                                  #8.059371e-17 is the default value
+                   ),
+             ),
+       ),
+
+   actionButton (inputId="resetButton", label="Reset Parameters"),
+    
+   checkboxInput(inputId="defaultRun",  label=strong("Add default run?"), value=TRUE),
+   br(),
+   )
+
+    })
+  )
+)
+
+#-----------------------------------------------server-side part of the code----------------------------------------------------
+
+server <- function(input, output, session) {
+
+#ties the UI coded above to the server  
+  output$WB <- renderUI({  
+    CreateUI})
+
+#------------------------------------------------reset button definition--------------------------------------------------------
+  
+  observeEvent(input$resetButton, {
+    #resets parameters
+    updateNumericInput(session, "k1.deg.bac",             value = parms$k1.deg.bac)
+    updateNumericInput(session, "k2.deg.fun",             value = parms$k2.deg.fun)
+    updateNumericInput(session, "k3.deg.bisp",            value = parms$k3.deg.bisp)
+    updateNumericInput(session, "k4.bac.uptake",          value = parms$k4.bac.uptake)
+    updateNumericInput(session, "k5.fun.uptake",          value = parms$k5.fun.uptake)
+    updateNumericInput(session, "k6.bisp.uptake",         value = parms$k6.bisp.uptake)
+    updateNumericInput(session, "k7.fun.killing.bac",     value = parms$k7.fun.killing.bac)
+    updateNumericInput(session, "k8.bisp.killing.bac",    value = parms$k8.bisp.killing.bac)
+    updateNumericInput(session, "k9.bisp.killing.fun",    value = parms$k9.bisp.killing.fun)
+    updateNumericInput(session, "k10.bac.mort",           value = parms$k10.bac.mort)
+    updateNumericInput(session, "k11.fun.mort",           value = parms$k11.fun.mort)
+    updateNumericInput(session, "k12.bisp.mort",          value = parms$k12.bisp.mort)
+    updateNumericInput(session, "kBISPORUS",              value = parms$kBISPORUS)
+    updateNumericInput(session, "MAX.A.BISPORUS",         value = parms$MAX.A.BISPORUS)
+    updateNumericInput(session, "kSUGARS.bac",            value = parms$kSUGARS.bac)
+    updateNumericInput(session, "kSUGARS.fun",            value = parms$kSUGARS.fun)
+    updateNumericInput(session, "kSUGARS.bisp",           value = parms$kSUGARS.bisp)
+    updateNumericInput(session, "Ef.bac",                 value = parms$Ef.bac)
+    updateNumericInput(session, "Ef.fun",                 value = parms$Ef.fun)
+    updateNumericInput(session, "Ef.bisp",                value = parms$Ef.bisp)
+    #resets state variables
+    updateNumericInput(session, "BACTERIA",               value = state$BACTERIA)
+    updateNumericInput(session, "BACTERIA.13C",           value = state$BACTERIA.13C)
+    updateNumericInput(session, "FUNGI",                  value = state$FUNGI)
+    updateNumericInput(session, "FUNGI.13C",              value = state$FUNGI.13C)
+    updateNumericInput(session, "A.BISPORUS",             value = state$A.BISPORUS)
+    updateNumericInput(session, "A.BISPORUS.13C",         value = state$A.BISPORUS.13C)
+    updateNumericInput(session, "SUGARS",                 value = state$SUGARS)
+    updateNumericInput(session, "SUGARS.13C",             value = state$SUGARS.13C)
+    updateNumericInput(session, "COMPOST",                value = state$COMPOST)
+    updateNumericInput(session, "CO2",                    value = state$CO2)
+    updateNumericInput(session, "CO2.13C",                value = state$CO2.13C)
+  })
+
+#-------------------acquires model parameters and state variables which are defined in the user interface-----------------------
+  
+  getparms <- reactive( {
+    newparms                        <- parms 
+    newparms$k1.deg.bac             <- input$k1.deg.bac
+    newparms$k2.deg.fun             <- input$k2.deg.fun   
+    newparms$k3.deg.bisp            <- input$k3.deg.bisp 
+    newparms$k4.bac.uptake          <- input$k4.bac.uptake  
+    newparms$k5.fun.uptake          <- input$k5.fun.uptake
+    newparms$k6.bisp.uptake         <- input$k6.bisp.uptake 
+    newparms$k7.fun.killing.bac     <- input$k7.fun.killing.bac
+    newparms$k8.bisp.killing.bac    <- input$k8.bisp.killing.bac 
+    newparms$k9.bisp.killing.fun    <- input$k9.bisp.killing.fun 
+    newparms$k10.bac.mort           <- input$k10.bac.mort
+    newparms$k11.fun.mort           <- input$k11.fun.mort
+    newparms$k12.bisp.mort          <- input$k12.bisp.mort 
+    newparms$kBISPORUS              <- input$kBISPORUS
+    newparms$MAX.A.BISPORUS         <- input$MAX.A.BISPORUS 
+    newparms$kSUGARS.bac            <- input$kSUGARS.bac
+    newparms$kSUGARS.fun            <- input$kSUGARS.fun 
+    newparms$kSUGARS.bisp           <- input$kSUGARS.bisp
+    newparms$Ef.bac                 <- input$Ef.bac 
+    newparms$Ef.fun                 <- input$Ef.fun
+    newparms$Ef.bisp                <- input$Ef.bisp 
+    newparms
+  })
+
+  getstate <- reactive( {
+    newstate                        <- state
+    newstate$BACTERIA               <- input$BACTERIA
+    newstate$BACTERIA.13C           <- input$BACTERIA.13C
+    newstate$FUNGI                  <- input$FUNGI 
+    newstate$FUNGI.13C              <- input$FUNGI.13C 
+    newstate$A.BISPORUS             <- input$A.BISPORUS
+    newstate$A.BISPORUS.13C         <- input$A.BISPORUS.13C
+    newstate$SUGARS                 <- input$SUGARS
+    newstate$SUGARS.13C             <- input$SUGARS.13C
+    newstate$COMPOST                <- input$COMPOST 
+    newstate$CO2                    <- input$CO2
+    newstate$CO2.13C                <- input$CO2.13C
+    newstate
+  })
+  
+#-------------------------------------------------definition of the plot output-------------------------------------------------
+  
+  output$PlotWB <- renderPlot({
+
+   newparms     <- getparms()
+   newstate     <- getstate()
+   out          <- ode(y = unlist(newstate), parms = newparms, func = WHITEBUTTON, times = outtimes)
+
+   if (input$defaultRun) {
+      plot (out, defaultprog, mfrow=c(4,3), which=c("BACTERIA", "BACTERIA.13C", "FUNGI", "FUNGI.13C", "A.BISPORUS", "A.BISPORUS.13C", "SUGARS", "SUGARS.13C", "COMPOST", "CO2", "CO2.13C"), lwd = 2, las = 1, lty = 1, cex.main = 1.5, cex.axis = 1.25, cex.lab = 1.25)
+      legend("bottomright", legend = c("new", "default"), cex = 1.5, col = 1:2, lty = 1)
+    } else  
+      plot (out, lwd = 2, las = 1, lty = 1, cex.main = 1.5, cex.axis = 1.25, cex.lab = 1.25) 
+   })                          
+}     
+
+#-----------------------------------------------run as interactive user interface-----------------------------------------------
+
+shinyApp(ui, server)
+
+##---------------------------------------------end block interactive user interface---------------------------------------------
+```
