@@ -1,7 +1,7 @@
 ---
-title: "Working model without nematodes, with (literature parameters, PRETTY interactive UI, calibrated parameters, literature state variables, 13C version). 13C state variables are not working on the sliders."
+title: "Working model without nematodes, with (literature parameters, PRETTY interactive UI, calibrated parameters, literature state variables, 13C version)."
 author: "Lucy"
-date: "22/04/2022"
+date: "23/04/2022"
 output:
   pdf_document: default
   html_document: default
