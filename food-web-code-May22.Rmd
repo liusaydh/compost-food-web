@@ -267,7 +267,7 @@ ui <- fluidPage(fluid = TRUE,
                    tabPanel(strong("Monod"),              value = 5, helpText("Monod (Michaelis-Menten) kinetics")),
                    tabPanel(strong("efficiency"),         value = 6, helpText("uptake efficiency of sugars")),
                    tabPanel(strong("initial states, L-"), value = 7, helpText("initial state variables (amounts and biomasses), natural abundance")),
-                   tabPanel(strong("initial states, L+"), value = 8, helpText("initial state variables (amounts and biomasses), labelled")),
+                   tabPanel(strong("initial states, L+"), value = 8, helpText("labelled compartments - smaller number = smaller excess, larger number = larger excess than default"))
        ),
 
 #be VERY CAREFUL with the indentation of conditional panels, otherwise nothing will ever work          
@@ -349,11 +349,11 @@ ui <- fluidPage(fluid = TRUE,
        conditionalPanel(condition = "input.tabselected == 8",
              fluidRow(
                    column(12,
-                         sliderInput(inputId="BACTERIA.13C", label = "labelled bacterial biomass", min = 1e-9, max = 1e-7, step = 1e-10, value = state$BACTERIA.13C),                                                                            #1.284503e-08 is the default value
-                         sliderInput(inputId="FUNGI.13C", label = "labelled fungal biomass", min = 1e-10, max = 1e-8, step = 1e-11, value = state$FUNGI.13C),                                                                                    #5.873365e-09 is the default value
-                         sliderInput(inputId="A.BISPORUS.13C", label = "labelled A. bisporus biomass", min = 1e-18, max = 1e-16, step = 1e-19, value = state$A.BISPORUS.13C),                                                                    #8.419548e-17 is the default value
-                         sliderInput(inputId="SUGARS.13C", label = "starting amount of labelled sugars in compost", min = 1e-12, max = 1e-10, step = 1e-13, value = state$SUGARS.13C),                                                           #1.550035e-11 is the default value
-                         sliderInput(inputId="CO2.13C", label = "respired labelled carbon dioxide due to biological activities", min = 1e-18, max = 1e-16, step = 1e-19, value = state$CO2.13C)                                                  #8.059371e-17 is the default value
+                         numericInput(inputId="BACTERIA.13C", label = "labelled bacterial biomass", value = 1.284503e-08, min = 1e-9, max = 1e-7, step = 1e-10),                                                                                  #1.284503e-08 is the default value
+                         numericInput(inputId="FUNGI.13C", label = "labelled fungal biomass", value = 5.873365e-09, min = 1e-10, max = 1e-8, step = 1e-11),                                                                                       #5.873365e-09 is the default value
+                         numericInput(inputId="A.BISPORUS.13C", label = "labelled A. bisporus biomass", value = 8.419548e-17, min = 1e-18, max = 1e-16, step = 1e-19),                                                                            #8.419548e-17 is the default value
+                         numericInput(inputId="SUGARS.13C", label = "starting amount of labelled sugars in compost", value = 1.550035e-11, min = 1e-12, max = 1e-10, step = 1e-13),                                                               #1.550035e-11 is the default value
+                         numericInput(inputId="CO2.13C", label = "respired labelled carbon dioxide due to biological activities", value = 8.059371e-17, min = 1e-18, max = 1e-16, step = 1e-19)                                                   #8.059371e-17 is the default value
                    ),
              ),
        ),
