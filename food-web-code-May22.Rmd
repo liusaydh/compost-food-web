@@ -1,7 +1,7 @@
 ---
 title: "Working model without nematodes, with (literature parameters, PRETTY interactive UI, calibrated parameters, literature state variables, 13C version)."
 author: "Lucy"
-date: "23/04/2022"
+date: "28/04/2022"
 output:
   pdf_document: default
   html_document: default
@@ -42,25 +42,25 @@ Definition of initial state variables, initial parameters for the default model 
 #for the same reason, values of state variables are now numbers instead of percentages, but the values are based on COMPOST = 15 still, just recalculated to fit right from previous percentages
 
 #excess 13C as calculated experimentally from PLFAs and other experiments, can be seen as amount of substance fractions x13C = COMPARTMENT.13C/COMPARTMENT
-#in mmol/g compost
-e.bac      = 8.708494e-9
-e.fun      = 3.670853e-9
-e.bisp     = 1.007484526275729929e-14
-e.sugars   = 1.8061e-12
-e.co2      = 8.059371e-12
+#in mmol/g compost dry weight
+e.bac      = 0.001042
+e.fun      = 8.1e-5
+e.bisp     = 8.1e-5 #2.88e-9
+e.sugars   = 0.011421
+e.co2      = 2.31e-7
 
 
 state     <- list(BACTERIA       = 1.475,
                   BACTERIA.13C   = 1.475*e.bac,
                   FUNGI          = 1.6, 
-                  FUNGI.13C      = 1.6*e.fun, 
+                  FUNGI.13C      = 1.6*e.fun,
                   A.BISPORUS     = 0.008357, 
-                  A.BISPORUS.13C = 0.008357*e.bisp, 
+                  A.BISPORUS.13C = 0.008357*e.bisp,
                   SUGARS         = 8.58222, 
-                  SUGARS.13C     = 8.58222*e.sugars, 
+                  SUGARS.13C     = 8.58222*e.sugars,
                   COMPOST        = 25, 
                   CO2            = 0.00001,
-                  CO2.13C        = 0.00001*e.co2 
+                  CO2.13C        = 0.00001*e.co2
 )
 
 #-------------------------------------parameters that comprise rate laws of processes go here--------------------------------
@@ -349,11 +349,11 @@ ui <- fluidPage(fluid = TRUE,
        conditionalPanel(condition = "input.tabselected == 8",
              fluidRow(
                    column(12,
-                         numericInput(inputId="BACTERIA.13C", label = "labelled bacterial biomass", value = 1.284503e-08, min = 1e-9, max = 1e-7, step = 1e-10),                                                                                  #1.284503e-08 is the default value
-                         numericInput(inputId="FUNGI.13C", label = "labelled fungal biomass", value = 5.873365e-09, min = 1e-10, max = 1e-8, step = 1e-11),                                                                                       #5.873365e-09 is the default value
-                         numericInput(inputId="A.BISPORUS.13C", label = "labelled A. bisporus biomass", value = 8.419548e-17, min = 1e-18, max = 1e-16, step = 1e-19),                                                                            #8.419548e-17 is the default value
-                         numericInput(inputId="SUGARS.13C", label = "starting amount of labelled sugars in compost", value = 1.550035e-11, min = 1e-12, max = 1e-10, step = 1e-13),                                                               #1.550035e-11 is the default value
-                         numericInput(inputId="CO2.13C", label = "respired labelled carbon dioxide due to biological activities", value = 8.059371e-17, min = 1e-18, max = 1e-16, step = 1e-19)                                                   #8.059371e-17 is the default value
+                         numericInput(inputId="BACTERIA.13C", label = "labelled bacterial biomass", value = 0.00153695, min = 0.0001, max = 1, step = 0.0001),                                                                                  #0.00153695 is the default value
+                         numericInput(inputId="FUNGI.13C", label = "labelled fungal biomass", value = 0.0001296, min = 0.00001, max = 1, step = 0.00001),                                                                                       #0.0001296 is the default value
+                         numericInput(inputId="A.BISPORUS.13C", label = "labelled A. bisporus biomass", value = 0.0001296, min = 0.00001, max = 1, step = 0.00001),                                                                            #2.406816e-11 is the real value, but we try with mushrooms value here
+                         numericInput(inputId="SUGARS.13C", label = "starting amount of labelled sugars in compost", value = 0.09801753, min = 0.001, max = 1, step = 0.001),                                                               #0.09801753 is the default value
+                         numericInput(inputId="CO2.13C", label = "respired labelled carbon dioxide due to biological activities", value = 2.31e-12, min = 1e-12, max = 1e-13, step = 1e-13)                                                   #2.31e-12 is the default value
                    ),
              ),
        ),
