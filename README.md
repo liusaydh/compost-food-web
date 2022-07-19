@@ -90,19 +90,19 @@ In the <sup>13</sup>C model addition, excess <sup>13</sup>C calculated from PLFA
 
 Excess parameter | Description | Unit | Value | Source(s) | Comments |
 --- | --- | --- | --- |--- |--- |
-e.bac | <sup>13</sup>C excess in bacteria | mmol C/g compost | 0.001042 | Vîtă (van Dam), 2022. | calculated from bacterial PLFA biomarkers, 1F
-e.fun | <sup>13</sup>C excess in fungi | mmol C/g compost | 8.1e-5 | Vîtă (van Dam), 2022. | calculated from fungal PLFA biomarkers, 1F
-e.bisp | <sup>13</sup>C excess in _A. bisporus_ | mmol C/g compost | 2.88e-9 | Vîtă (van Dam), 2022. | calculated from fungal PLFA biomarkers, 0.5F, uncharacteristically small value, sometimes e.fun value is used instead
-e.sugars | <sup>13</sup>C excess in sugars | mmol C/g compost | 0.011421 | Vîtă (van Dam), 2022. | calculated from bulk carbon measurements
-e.co2 | <sup>13</sup>C excess in respired carbon dioxide | mmol C/g compost | 2.31e-7 | Vîtă (van Dam), 2022. | calculated from carbon dioxide tests
+e.bac | <sup>13</sup>C excess in bacteria | mmol C/g compost | 0.001625 / 0.00239 | Vîtă, 2022. | first value calculated from bacterial PLFA biomarkers (1F) / second value calculated from bacterial PLFA biomarkers (Lucy)
+e.fun | <sup>13</sup>C excess in fungi | mmol C/g compost | 8.1e-5 / 8.03e-6 | Vîtă, 2022. | first value calculated from fungal PLFA biomarkers (1F) / second value calculated from fungal PLFA biomarkers (Lucy)
+e.bisp | <sup>13</sup>C excess in _A. bisporus_ | mmol C/g compost | 2.88e-9 | Vîtă, 2022. | calculated from fungal PLFA biomarkers (0.5F) uncharacteristically small value, e.fun value is used instead
+e.sugars | <sup>13</sup>C excess in sugars | mmol C/g compost | 0.011421 | Vîtă, 2022. | calculated from bulk carbon measurements
+e.co2 | <sup>13</sup>C excess in respired carbon dioxide | mmol C/g compost | 2.31e-7 | Vîtă, 2022. | calculated from carbon dioxide tests
 
 <sup>13</sup>C state variable | Description | Unit | Value | Source(s) | Comments |
 --- | --- | --- | --- |--- |--- |
-BACTERIA.13C | incorporation of <sup>13</sup>C label by bacteria | mmol C/g compost | 0.00153695 | Vîtă (van Dam), 2022. | BACTERIA.13C = BACTERIA * e.bac
-FUNGI.13C | incorporation of <sup>13</sup>C label by fungi | mmol C/g compost | 0.0001296 | Vîtă (van Dam), 2022. | FUNGI.13C = FUNGI * e.fun
-A.BISPORUS.13C | incorporation of <sup>13</sup>C label by _A. bisporus_ | mmol C/g compost | 2.406816e-11 | Vîtă (van Dam), 2022. | A.BISPORUS.13C = A.BISPORUS * e.bisp
-SUGARS.13C | <sup>13</sup>C label effect on sugars | mmol C/g compost | 0.09801753 | Vîtă (van Dam), 2022. | SUGARS.13C = SUGARS * e.sugars
-CO2.13C | <sup>13</sup>C label effect on total respiration | mmol C/g compost | 2.31e-12 | Vîtă (van Dam), 2022. | CO2.13C = CO2 * e.co2
+BACTERIA.13C | incorporation of <sup>13</sup>C label by bacteria | mmol C/g compost | 0.002396875 or 0.000352525 | Vîtă, 2022. | BACTERIA.13C = BACTERIA * e.bac
+FUNGI.13C | incorporation of <sup>13</sup>C label by fungi | mmol C/g compost | 0.0001296 or 0.000012848 | Vîtă, 2022. | FUNGI.13C = FUNGI * e.fun
+A.BISPORUS.13C | incorporation of <sup>13</sup>C label by _A. bisporus_ | mmol C/g compost | 2.406816e-11 | Vîtă, 2022. | A.BISPORUS.13C = A.BISPORUS * e.bisp
+SUGARS.13C | <sup>13</sup>C label effect on sugars | mmol C/g compost | 0.09801753 | Vîtă, 2022. | SUGARS.13C = SUGARS * e.sugars
+CO2.13C | <sup>13</sup>C label effect on total respiration | mmol C/g compost | 2.31e-12 | Vîtă, 2022. | CO2.13C = CO2 * e.co2
 
 
 
