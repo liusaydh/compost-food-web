@@ -54,13 +54,13 @@ Parameter | Description | Unit | Value | Source(s) | Comments |
 Ef.bac | fraction of C assimilated by bacteria into their biomass as a result of metabolisation of sugars | (-) | 0.4 | Sinsabaugh, 2016. + Aanderud, 2018. | max. 30% is assimilated in biomass for soil dwellers, and is based on their C:N biomass ratio (around 8) / calibrated to 0.4 in the model
 Ef.fun | fraction of C assimilated by fungi into their biomass as a result of metabolisation of sugars | (-) | 0.3 | Sinsabaugh, 2016. + Aanderud, 2018. | should be less than bacteria though, up to 10 times less
 Ef.bisp | fraction of C assimilated by _A. bisporus_ into their biomass as a result of metabolisation of sugars | (-) | 0.016 - 0.3 | Krakowska, 2021., Sinsabaugh, 2016. + Aanderud, 2018. | calibrated to 0.4 in the model
-kBISPORUS | Monod rate constant for _A. bisporus_ biomass | mmol C per cubic meter | 0.5 | calibrated |  
-MAX.A.BISPORUS | maximum possible unlimited _A. bisporus_ biomass growth | mmol C per cubic meter | 1 | calibrated |
-kSUGARS.bac | bacterial growth limitation due to sugars availability (C.INI * %) | mmol C per cubic meter | 0.1 - 0.4 | Vîtă (van Dam), 2022. | check star conditions in Femke's thesis
-kSUGARS.fun | fungal growth limitation due to sugars availability (C.INI * %) | mmol C per cubic meter | 0.1 - 0.4 | Vîtă (van Dam), 2022. | check star conditions in Femke's thesis    
-kSUGARS.bisp | _A. bisporus_ growth limitation due to sugars availability (C.INI * %) | mmol C per cubic meter | 0.1 - 0.4 | calibrated | expected similar to other fungi 
-k1.deg.bac | degradation of recalcitrant materials from compost into sugars by bacteria | /d | 0.05 - 0.15 | Soares & Rousk, 2019. + Vîtă (van Dam), 2022. | 
-k2.deg.fun | degradation of recalcitrant materials from compost into sugars by fungi | /d | 0.05 - 0.15 | Soares & Rousk, 2019. + Vîtă (van Dam), 2022. | fungi are expected to be better degraders than bacteria, in this context / calibrated to 0.2 in the model
+kBISPORUS | Monod rate constant for _A. bisporus_ biomass | mmol C/g compost | 0.5 | calibrated |  
+MAX.A.BISPORUS | maximum possible unlimited _A. bisporus_ biomass growth | mmol C/g compost | 1 | calibrated |
+kSUGARS.bac | bacterial growth limitation due to sugars availability (C.INI * %) | mmol C/ g compost | 0.1 - 0.4 | Vîtă, 2022. | check star conditions in Femke's thesis
+kSUGARS.fun | fungal growth limitation due to sugars availability (C.INI * %) | mmol C/ g compost | 0.1 - 0.4 | Vîtă, 2022. | check star conditions in Femke's thesis    
+kSUGARS.bisp | _A. bisporus_ growth limitation due to sugars availability (C.INI * %) | mmol C/ g compost | 0.1 - 0.4 | calibrated | expected similar to other fungi 
+k1.deg.bac | degradation of recalcitrant materials from compost into sugars by bacteria | /d | 0.05 - 0.15 | Soares & Rousk, 2019. + Vîtă, 2022. | 
+k2.deg.fun | degradation of recalcitrant materials from compost into sugars by fungi | /d | 0.05 - 0.15 | Soares & Rousk, 2019. + Vîtă, 2022. | fungi are expected to be better degraders than bacteria, in this context / calibrated to 0.2 in the model
 k3.deg.bisp | degradation of recalcitrant materials from compost into sugars by _A. bisporus_ | /d | 0.075 - 0.13 | Andlar et al. 2018. | values found correspond to fungi whose active enzymes are incredibly similar in activity to _A. bisporus_, calibrated to 0.01 in the model
 k4.bac.uptake | maximum uptake rate of carbohydrates by bacteria | /d | 0.04 - 0.1 | Bore et al. 2017. |
 k5.fun.uptake | maximum uptake rate of carbohydrates by fungi | /d | 0.01 - 0.05 | Bore et al. 2017. |
@@ -68,9 +68,9 @@ k6.bisp.uptake | maximum uptake rate of carbohydrates by _A. bisporus_ | /d | 0.
 k7.fun.killing.bac | maximum predation rate constant for fungi predating on bacteria | /d | 0.1 - 0.2 | calibrated |
 k8.bisp.killing.bac | maximum predation rate constant for _A. bisporus_ predating on bacteria | /d | 0.1 - 0.2 | calibrated |
 k9.bisp.killing.fun | maximum predation rate constant for _A. bisporus_ predating on fungi | /d | 0.2 - 0.5 | calibrated |
-k10.bac.mort | bacterial linear mortality rate constant | (mmol C per cubic meter)/d | 0.24 - 0.72 | Servais et al., 1985. | in water environments, calibrated to 0.1 |
-k11.fun.mort | fungal linear mortality rate constant | (mmol C per cubic meter)/d | 0.01 - 0.1 | Lamour, 2002. | generally slower than bacteria |
-k12.bisp.mort | _A. bisporus_ linear mortality rate constant | (mmol C per cubic meter)/d | 0 | Koch, 1958. | death under suitable growth conditions is uncommon, but calibrated to 0.01 in the model because it cannot be zero |
+k10.bac.mort | bacterial linear mortality rate constant | (mmol C/g compost)/d | 0.24 - 0.72 | Servais et al., 1985. | in water environments, calibrated to 0.1 |
+k11.fun.mort | fungal linear mortality rate constant | (mmol C/g compost)/d | 0.01 - 0.1 | Lamour, 2002. | generally slower than bacteria |
+k12.bisp.mort | _A. bisporus_ linear mortality rate constant | (mmol C/g compost)/d | 0 | Koch, 1958. | death under suitable growth conditions is uncommon, but calibrated to 0.01 in the model because it cannot be zero |
 
 In addition, the system has starting state variables which are conditions that are in place the moment the model is ran. These most often refer to the amounts of biomass at the beginning of the run and are viewable in the table below.
 
