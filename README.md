@@ -56,9 +56,9 @@ Ef.fun | fraction of C assimilated by fungi into their biomass as a result of me
 Ef.bisp | fraction of C assimilated by _A. bisporus_ into their biomass as a result of metabolisation of sugars | (-) | 0.016 - 0.3 | Krakowska, 2021., Sinsabaugh, 2016. + Aanderud, 2018. | calibrated to 0.4 in the model
 kBISPORUS | Monod rate constant for _A. bisporus_ biomass | mmol C/g compost | 0.5 | calibrated |  
 MAX.A.BISPORUS | maximum possible unlimited _A. bisporus_ biomass growth | mmol C/g compost | 1 | calibrated |
-kSUGARS.bac | bacterial growth limitation due to sugars availability (C.INI * %) | mmol C/ g compost | 0.1 - 0.4 | Vîtă, 2022. | check star conditions in Femke's thesis
-kSUGARS.fun | fungal growth limitation due to sugars availability (C.INI * %) | mmol C/ g compost | 0.1 - 0.4 | Vîtă, 2022. | check star conditions in Femke's thesis    
-kSUGARS.bisp | _A. bisporus_ growth limitation due to sugars availability (C.INI * %) | mmol C/ g compost | 0.1 - 0.4 | calibrated | expected similar to other fungi 
+kSUGARS.bac | bacterial growth limitation due to sugars availability (C.INI * %) | mmol C/g compost | 0.1 - 0.4 | Vîtă, 2022. | check star conditions in Femke's thesis
+kSUGARS.fun | fungal growth limitation due to sugars availability (C.INI * %) | mmol C/g compost | 0.1 - 0.4 | Vîtă, 2022. | check star conditions in Femke's thesis    
+kSUGARS.bisp | _A. bisporus_ growth limitation due to sugars availability (C.INI * %) | mmol C/g compost | 0.1 - 0.4 | calibrated | expected similar to other fungi 
 k1.deg.bac | degradation of recalcitrant materials from compost into sugars by bacteria | /d | 0.05 - 0.15 | Soares & Rousk, 2019. + Vîtă, 2022. | 
 k2.deg.fun | degradation of recalcitrant materials from compost into sugars by fungi | /d | 0.05 - 0.15 | Soares & Rousk, 2019. + Vîtă, 2022. | fungi are expected to be better degraders than bacteria, in this context / calibrated to 0.2 in the model
 k3.deg.bisp | degradation of recalcitrant materials from compost into sugars by _A. bisporus_ | /d | 0.075 - 0.13 | Andlar et al. 2018. | values found correspond to fungi whose active enzymes are incredibly similar in activity to _A. bisporus_, calibrated to 0.01 in the model
