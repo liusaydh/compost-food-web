@@ -10,7 +10,7 @@ As an artificial environment, specifically created to maximally propagate a sing
 <p align="center">
   <img 
     width="800"
-    src="flowcharts/diagramMar22.png"
+    src="flowcharts/natural abundance diagram.png"
   >
 </p>
 
@@ -25,7 +25,7 @@ An extension of this basic model comes from labelling experiments, where labelle
 <p align="center">
   <img 
     width="800"
-    src="flowcharts/injection.png"
+    src="flowcharts/13c diagram step 2.png"
   >
 </p>
 
@@ -34,7 +34,7 @@ As the time of the experiment progresses, surplus <sup>13</sup>C accumulates in 
 <p align="center">
   <img 
     width="800"
-    src="flowcharts/incorporation.png"
+    src="flowcharts/13c diagram step 3.png"
   >
 </p>
 
@@ -43,7 +43,7 @@ Finally, surplus <sup>13</sup>C gets respired, incorporated and accumulates furt
 <p align="center">
   <img 
     width="800"
-    src="flowcharts/spread.png"
+    src="flowcharts/13c diagram step 4.png"
   >
 </p>
 
